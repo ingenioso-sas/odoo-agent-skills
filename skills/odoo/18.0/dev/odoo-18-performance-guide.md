@@ -460,7 +460,7 @@ orders.with_context(tracking_disable=True).write({'state': 'done'})
 - [ ] Add all dependencies to `@api.depends`
 - [ ] Use `with_context(bin_size=True)` for binary fields
 - [ ] Use `with_context(active_test=False)` when including archived
-- [ ] Use `read_group()` for aggregations
+- [ ] Use `read_group()` for aggregations (prefer over `_read_group()` - it has lazy grouping and metadata)
 - [ ] Batch create/write/unlink operations
 - [ ] Add indexes on frequently searched fields
 - [ ] Use `filtered()` before operations

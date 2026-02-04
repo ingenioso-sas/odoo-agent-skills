@@ -183,7 +183,9 @@ records.fetch(['name', 'amount_total', 'partner_id'])
 
 ---
 
-## read_group Internals (Odoo 18)
+## _read_group Internal Methods (Odoo 18)
+
+These internal methods are used by Odoo's ORM and can be extended when overriding `_read_group()`.
 
 ### READ_GROUP Constants
 
@@ -271,6 +273,35 @@ result = self.read_group(
 #     ...
 # ]
 ```
+
+### _read_group() - Low-Level Internal Method (Odoo 18)
+
+**IMPORTANT**: `_read_group()` is a **low-level internal method** used by the ORM. It returns raw tuples without `__domain`, `__context`, or `__range` metadata. Prefer using `read_group()` for typical use cases.
+
+```python
+# Internal use only - returns list of tuples
+rows = self._read_group(
+    domain=[('state', '=', 'draft')],
+    groupby=['category_id'],
+    aggregates=['amount_total:sum'],
+    order='category_id'
+)
+# Result: [(1, 1500.0), (2, 2000.0), ...] - raw tuples
+```
+
+**When to use `_read_group`**: Rarely, only for low-level custom SQL aggregation where you don't need the extra metadata that `read_group()` provides.
+
+### read_group() vs _read_group()
+
+| Method | Return Type | Has lazy | Has __domain | When to Use |
+|--------|-------------|---------|--------------|-------------|
+| `read_group()` | List of dicts | Yes | Yes | Most cases - calling aggregation from other models |
+| `_read_group()` | List of tuples | No | No | Low-level internal use only |
+
+**For extending aggregation behavior**, use these helper methods instead:
+- `_read_group_expand_states()` - Expand selection groups
+- `_read_group_select()` - Custom aggregate SQL
+- `_read_group_groupby()` - Custom groupby SQL
 
 ### group_expand Parameter (Odoo 18)
 

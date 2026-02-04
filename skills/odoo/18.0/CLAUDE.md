@@ -75,6 +75,7 @@ agent-skills/skills/odoo/18.0/
 | `attrs="{'invisible': [...]}"` | Deprecated in Odoo 18 | Use `invisible="..."` direct attribute |
 | `@api.depends('partner_id')` then accessing `partner_id.email` | N queries per record | Add `@api.depends('partner_id.email')` |
 | `search()` inside loop | N+1 queries | Use `search()` with `IN` domain or `read_group()` |
+| Using `_read_group()` instead of `read_group()` | Returns raw tuples, no lazy grouping, no metadata | Use `read_group()` for normal aggregation |
 | `create()` in loop | N INSERT statements | Batch: `create([{...}, {...}])` |
 | Overriding `unlink()` for validation | Breaks module uninstall | Use `@api.ondelete(at_uninstall=False)` |
 | Using `<tree>` in Odoo 18 | Deprecated tag | Use `<list>` instead |
