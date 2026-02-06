@@ -1,66 +1,42 @@
-# 🚀 Agent Skills
+# Agent Skills
 
 ![Agent Skills Hero](lib/image/header.png)
 
----
-
-## 🌟 Overview
-
-**Agent Skills** is a high-performance ecosystem featuring **versioned documentation, specialized skill packs, and expert agents**. This repository transforms generic AI assistants into domain-specific powerhouses, providing the deep technical context required for professional software engineering.
-
-By integrating **Agent Skills** into IDEs like **Cursor, Claude Code, Windsurf, or Aider**, you ensure your AI partner inherits thousands of lines of curated, framework-specific knowledge, elite coding patterns, and automated review capabilities.
+<!-- Badges -->
+[![Star History Chart](https://api.star-history.com/svg?repos=unclecatvn/agent-skills&type=Date)](https://star-history.com/#unclecatvn/agent-skills&Date)
 
 ---
 
-## ✨ Key Features
+## What is Agent Skills?
 
-|        Specialized Skills         |       Expert Agents       |   Intelligence Rules    |
-| :-------------------------------: | :-----------------------: | :---------------------: |
-| Versioned Docs (Odoo 18.0 & 19.0) | Dedicated code reviewers  |  Standard Coding Style  |
-|   Optimized for context windows   | Scoring-based assessments | Security Audit Patterns |
-|     8,000+ lines of expertise     | Best-practice enforcement | Implementation Planning |
+**Agent Skills** is a collection of documentation and specialized agents that supercharge AI coding assistants like Cursor, Claude Code, Windsurf, and Aider.
 
----
+Think of it as a "knowledge pack" - when you add Agent Skills to your project, your AI assistant gains access to thousands of lines of curated technical expertise about specific frameworks and technologies. This means better code suggestions, fewer mistakes, and more helpful responses.
 
-## 📂 Project Structure
+### Why use it?
 
-```mermaid
-graph TD
-    A[Agent Skills] --> B[Skills]
-    A --> C[Agents]
-    A --> E[Rules]
-    A --> F[CLI Tool]
+- **Generic AI assistants** give you general programming advice
+- **AI assistants with Agent Skills** give you framework-specific, best-practice guidance
 
-    B --> B1[Odoo 18.0 & 19.0 Docs]
-    B --> B2[Brainstorming]
-    B --> B3[MCP Builder]
-
-    C --> C1[Odoo Code Review]
-    C --> C2[Planner Agent]
-
-    E --> E1[Coding Style]
-    E --> E2[Security Audit]
-```
+For example, instead of just getting "how to write a Python function," you get "how to write an Odoo model following Odoo 18.0 conventions with proper ORM usage."
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
-### 1. Installation via NPX (Recommended)
-
-The fastest and most flexible way to add Agent Skills to your project is via the `skills` command:
+Get started in 30 seconds with NPX (recommended):
 
 ```bash
-# Add the Agent Skills repository to your current project
+# Add Agent Skills to your current project
 npx skills add unclecatvn/agent-skills
 ```
 
-### 2. Manual CLI Installation
+That's it! Your AI assistant will now have access to all the skills in this repository.
 
-For deep integration and local version management:
+### Alternative: Manual Installation
 
 ```bash
-# Install globally
+# Install the CLI globally
 npm install -g @unclecat/agent-skills-cli
 
 # Initialize a specific skill (e.g., Odoo 19 for Cursor)
@@ -69,48 +45,114 @@ agent-skills init --ai cursor odoo --version 19.0
 
 ---
 
-## 📦 Core Components
+## What's Inside?
 
-### 🏗️ Skill Packs (`/skills`)
+### Skills - Framework Documentation
 
-Deep technical documentation optimized for token-efficient AI consumption.
+In-depth guides written specifically for AI consumption:
 
-- **[Odoo 18.0](skills/odoo/18.0/) & [19.0](skills/odoo/19.0/)**: 21+ specialized guides covering ORM, OWL, Web Client, and Performance.
-- **[Brainstorming](skills/brainstorming/SKILL.md)**: Structured frameworks for feature Ideation.
-- **[MCP Builder](skills/mcp-builder/SKILL.md)**: Instructions for building Model Context Protocol servers.
+| Skill | Description |
+|-------|-------------|
+| **[Odoo 18.0](skills/odoo/18.0/)** | Complete Odoo 18 development guide (ORM, OWL, Web Client, Performance) |
+| **[Odoo 19.0](skills/odoo/19.0/)** | Complete Odoo 19 development guide with latest features |
+| **[Brainstorming](skills/brainstorming/SKILL.md)** | Structured framework for feature ideation |
+| **[MCP Builder](skills/mcp-builder/SKILL.md)** | Guide for building Model Context Protocol servers |
 
-### 🛡️ Expert Agents (`/agents`)
+### Agents - Autonomous Reviewers
 
-Autonomous agents that act as senior technical leads.
+Specialized agents that act as senior technical leads:
 
-- **[Odoo Reviewer](agents/odoo-code-review/SKILL.md)**: Automated code review with weighted scoring (1-10).
-- **[Planner](agents/planner.md)**: Expert at breaking down complex features into actionable steps.
+| Agent | What it does |
+|-------|--------------|
+| **[Odoo Code Review](agents/odoo-code-review/SKILL.md)** | Automatically reviews Odoo code with scoring (1-10) and detailed feedback |
+| **[Planner](agents/planner.md)** | Breaks down complex features into actionable implementation steps |
 
-### 📏 Intelligence Rules (`/rules`)
+### Rules - Coding Standards
 
-Strict enforcement of coding standards and security protocols.
+Enforced patterns for consistent, secure code:
 
-- **[Coding Style](rules/coding-style.md)**: Best practices for naming, imports, and structure.
-- **[Security](rules/security.md)**: Hardened rules for enterprise application development.
-
----
-
-## 📊 Project Statistics
-
-| Category                | Coverage                             |
-| ----------------------- | ------------------------------------ |
-| **Total Documentation** | 10,000+ Lines                        |
-| **Active Skill Packs**  | Odoo 18.0, 19.0, Brainstorming, MCP  |
-| **Specialized Agents**  | Reviewers & Planners                 |
-| **Supported IDEs**      | Cursor, Claude Code, Windsurf, Aider |
-| **License**             | MIT                                  |
+| Rule | Description |
+|------|-------------|
+| **[Coding Style](rules/coding-style.md)** | Best practices for naming, imports, and code structure |
+| **[Security](rules/security.md)** | Security patterns for enterprise applications |
 
 ---
 
-## 🤝 Contributing
+## Project Structure
 
-We welcome contributions to expand the intelligence available to the community. Please see our [Contributing Guide](#contributing) for details on how to add new skills, agents, or commands.
+```
+agent-skills/
+├── skills/           # Framework documentation (Odoo, Brainstorming, MCP)
+├── agents/           # Autonomous code reviewers and planners
+├── rules/            # Coding standards and security patterns
+└── lib/              # Shared resources and images
+```
 
 ---
 
-_Last updated: January 31, 2026_
+## Supported IDEs
+
+Agent Skills works with popular AI-powered IDEs:
+
+- **Cursor** - Full integration via CLI
+- **Claude Code** - Native skill support
+- **Windsurf** - Compatible
+- **Aider** - Compatible
+
+---
+
+## How It Works
+
+```mermaid
+graph LR
+    A[Your AI Assistant] --> B[Reads Agent Skills]
+    B --> C[Framework Knowledge]
+    B --> D[Best Practices]
+    B --> E[Code Patterns]
+    C --> F[Better Code Suggestions]
+    D --> F
+    E --> F
+```
+
+1. You add Agent Skills to your project
+2. Your AI assistant reads the relevant skill files
+3. The AI uses this context to provide framework-specific guidance
+4. You get better, more accurate code assistance
+
+---
+
+## Stats
+
+| Metric | Value |
+|--------|-------|
+| Documentation | 10,000+ lines |
+| Skill Packs | Odoo 18.0, 19.0, Brainstorming, MCP |
+| Agents | Code Reviewer, Planner |
+| License | MIT |
+
+---
+
+## Contributing
+
+We welcome contributions! Here's how you can help:
+
+- **Add new skills** - Create documentation for other frameworks
+- **Improve existing docs** - Fix errors, add examples
+- **Create agents** - Build specialized reviewers or planners
+- **Report issues** - Let us know what's missing or broken
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+---
+
+## Links
+
+- [Issues](https://github.com/unclecatvn/agent-skills/issues)
+- [Discussions](https://github.com/unclecatvn/agent-skills/discussions)
+- [Releases](https://github.com/unclecatvn/agent-skills/releases)
+
+---
+
+_If you find this project helpful, please consider giving it a star!_
+
+[![Star History Chart](https://api.star-history.com/svg?repos=unclecatvn/agent-skills&type=Date)](https://star-history.com/#unclecatvn/agent-skills&Date)

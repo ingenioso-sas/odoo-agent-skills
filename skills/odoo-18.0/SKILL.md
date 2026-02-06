@@ -33,6 +33,7 @@ Master index for all Odoo 18 guides. Use this to quickly find the appropriate gu
 | [Views & XML](#view-guide) | `odoo-18-view-guide.md` | Writing XML views, actions, menus, QWeb templates |
 | [OWL Components](#owl-guide) | `odoo-18-owl-guide.md` | Building OWL UI components, hooks, services |
 | [Migration](#migration-guide) | `odoo-18-migration-guide.md` | Upgrading modules, data migration, version changes |
+| [DTG Base](#dtg-base-guide) | `odoo-18-dtg-base-guide.md` | DTGBase utilities, date/period, timezone, batch processing |
 
 ---
 
@@ -134,6 +135,20 @@ Master index for all Odoo 18 guides. Use this to quickly find the appropriate gu
 - Handling data migration
 - Using module hooks (pre_init, post_init, uninstall)
 - Version-specific migration logic
+
+---
+
+### DTG Base Guide
+**File**: `odoo-18-dtg-base-guide.md`
+
+**When to read**:
+- Inheriting from DTGBase abstract model
+- Date/period calculations (find_first_date_of_period, find_last_date_of_period)
+- Timezone conversion (convert_local_to_utc, convert_utc_to_local)
+- Batch processing large recordsets (splittor)
+- Barcode validation/generation
+- Vietnamese text processing
+- File zipping utilities
 
 ---
 
@@ -277,6 +292,7 @@ agent-skills/skills/odoo/18.0/
 │   ├── odoo-18-data-guide.md        # XML/CSV data files, records
 │   ├── odoo-18-decorator-guide.md   # @api decorators
 │   ├── odoo-18-development-guide.md # Manifest, wizards (overview)
+│   ├── odoo-18-dtg-base-guide.md    # DTGBase utilities, date/period, timezone
 │   ├── odoo-18-field-guide.md       # Field types, parameters
 │   ├── odoo-18-manifest-guide.md    # __manifest__.py reference
 │   ├── odoo-18-mixins-guide.md      # mail.thread, activities, etc.
