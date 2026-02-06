@@ -52,6 +52,7 @@ In-depth guides written specifically for AI consumption:
 |-------|-------------|
 | **[Odoo 18.0](skills/odoo-18.0/)** | Complete Odoo 18 development guide (ORM, OWL, Web Client, Performance) |
 | **[Odoo 19.0](skills/odoo-19.0/)** | Complete Odoo 19 development guide with latest features |
+| **[DTG Base](skills/dtg-base/)** | DTGBase utilities (date/period, timezone, batch, barcode, Vietnamese text) |
 | **[Payment Integration](skills/payment-integration/)** | Integration guides for SePay, Polar, Stripe, Paddle, Creem.io |
 | **[Code Review](skills/code-review/)** | Standards and protocols for automated code review |
 | **[Brainstorming](skills/brainstorming/)** | Structured framework for feature ideation |
@@ -85,6 +86,7 @@ agent-skills/
 ├── skills/
 │   ├── odoo-18.0/        # Odoo 18 development guide
 │   ├── odoo-19.0/        # Odoo 19 development guide
+│   ├── dtg-base/         # DTGBase utilities (date/period, timezone, batch)
 │   ├── payment-integration/  # Payment provider integrations
 │   ├── code-review/      # Code review standards
 │   ├── brainstorming/    # Feature ideation framework
@@ -133,7 +135,7 @@ graph LR
 | Metric | Value |
 |--------|-------|
 | Documentation | 10,000+ lines |
-| Skill Packs | 7 (Odoo 18.0, 19.0, Payment, Code Review, Brainstorming, Writing, MCP) |
+| Skill Packs | 8 (Odoo 18.0, 19.0, DTG Base, Payment, Code Review, Brainstorming, Writing, MCP) |
 | Agents | Code Reviewer, Planner |
 | License | MIT |
 

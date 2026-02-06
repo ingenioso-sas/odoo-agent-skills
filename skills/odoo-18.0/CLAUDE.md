@@ -11,13 +11,12 @@ The `agent-skills/skills/odoo/18.0/dev/` directory contains modular guides for O
 ```
 agent-skills/skills/odoo/18.0/
 ├── SKILL.md                       # Master index
-├── dev/                           # Development guides (19 files)
+├── dev/                           # Development guides (18 files)
 │   ├── odoo-18-actions-guide.md     # ir.actions.*, cron, bindings
 │   ├── odoo-18-controller-guide.md  # HTTP, routing, controllers
 │   ├── odoo-18-data-guide.md        # XML/CSV data files, records
 │   ├── odoo-18-decorator-guide.md   # @api decorators
 │   ├── odoo-18-development-guide.md # Manifest, wizards (overview)
-│   ├── odoo-18-dtg-base-guide.md    # DTGBase utilities, date/period, timezone
 │   ├── odoo-18-field-guide.md       # Field types, parameters
 │   ├── odoo-18-manifest-guide.md    # __manifest__.py reference
 │   ├── odoo-18-mixins-guide.md      # mail.thread, activities, etc.
@@ -57,7 +56,6 @@ agent-skills/skills/odoo/18.0/
 | Configuring security (ACL, rules) | `dev/odoo-18-security-guide.md` |
 | Writing tests | `dev/odoo-18-testing-guide.md` |
 | Adding translations/localization | `dev/odoo-18-translation-guide.md` |
-| Using DTGBase utilities (date/period, timezone, batch) | `dev/odoo-18-dtg-base-guide.md` |
 
 ## Key Odoo 18 Changes
 
