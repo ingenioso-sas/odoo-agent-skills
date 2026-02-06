@@ -2,9 +2,6 @@
 
 ![Agent Skills Hero](lib/image/header.png)
 
-<!-- Badges -->
-[![Star History Chart](https://api.star-history.com/svg?repos=unclecatvn/agent-skills&type=Date)](https://star-history.com/#unclecatvn/agent-skills&Date)
-
 ---
 
 ## What is Agent Skills?
@@ -53,10 +50,13 @@ In-depth guides written specifically for AI consumption:
 
 | Skill | Description |
 |-------|-------------|
-| **[Odoo 18.0](skills/odoo/18.0/)** | Complete Odoo 18 development guide (ORM, OWL, Web Client, Performance) |
-| **[Odoo 19.0](skills/odoo/19.0/)** | Complete Odoo 19 development guide with latest features |
-| **[Brainstorming](skills/brainstorming/SKILL.md)** | Structured framework for feature ideation |
-| **[MCP Builder](skills/mcp-builder/SKILL.md)** | Guide for building Model Context Protocol servers |
+| **[Odoo 18.0](skills/odoo-18.0/)** | Complete Odoo 18 development guide (ORM, OWL, Web Client, Performance) |
+| **[Odoo 19.0](skills/odoo-19.0/)** | Complete Odoo 19 development guide with latest features |
+| **[Payment Integration](skills/payment-integration/)** | Integration guides for SePay, Polar, Stripe, Paddle, Creem.io |
+| **[Code Review](skills/code-review/)** | Standards and protocols for automated code review |
+| **[Brainstorming](skills/brainstorming/)** | Structured framework for feature ideation |
+| **[Writing Skills](skills/writing-skills/)** | Guide for creating and editing AI skills |
+| **[MCP Builder](skills/mcp-builder/)** | Guide for building Model Context Protocol servers |
 
 ### Agents - Autonomous Reviewers
 
@@ -82,7 +82,14 @@ Enforced patterns for consistent, secure code:
 
 ```
 agent-skills/
-├── skills/           # Framework documentation (Odoo, Brainstorming, MCP)
+├── skills/
+│   ├── odoo-18.0/        # Odoo 18 development guide
+│   ├── odoo-19.0/        # Odoo 19 development guide
+│   ├── payment-integration/  # Payment provider integrations
+│   ├── code-review/      # Code review standards
+│   ├── brainstorming/    # Feature ideation framework
+│   ├── writing-skills/   # Guide for creating skills
+│   └── mcp-builder/      # MCP server development guide
 ├── agents/           # Autonomous code reviewers and planners
 ├── rules/            # Coding standards and security patterns
 └── lib/              # Shared resources and images
@@ -126,7 +133,7 @@ graph LR
 | Metric | Value |
 |--------|-------|
 | Documentation | 10,000+ lines |
-| Skill Packs | Odoo 18.0, 19.0, Brainstorming, MCP |
+| Skill Packs | 7 (Odoo 18.0, 19.0, Payment, Code Review, Brainstorming, Writing, MCP) |
 | Agents | Code Reviewer, Planner |
 | License | MIT |
 
