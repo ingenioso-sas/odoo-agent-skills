@@ -451,23 +451,67 @@ ERROR: could not serialize access due to concurrent update
 # → Serialization error: two workers updating same records
 ```
 
-### Solution: Account-Level Locking
+### Solution: Record Locking with FOR UPDATE NOWAIT
+
+**This is the standard Odoo pattern** (used in base modules like `ir_sequence`, `account_edi`, etc.):
 
 ```python
-# Use PostgreSQL advisory lock to prevent concurrent processing
-def fetch_all_for_account(self, account_id):
-    # Try to acquire lock - returns False if locked
-    self.env.cr.execute("""
-        SELECT pg_try_advisory_xact_lock(%s)
-    """, (account_id,))
+from psycopg2.errors import LockNotAvailable
 
-    if not self.env.cr.fetchone()[0]:
-        # Another worker is processing this account
-        _logger.info("Account %s already being processed, skipping", account_id)
-        return
+def process_record_safe(self, record):
+    """Process record with locking to prevent concurrent processing."""
+    try:
+        # Try to acquire lock on the record - raises LockNotAvailable if locked
+        with self.env.cr.savepoint(flush=False):
+            self.env.cr.execute(
+                'SELECT * FROM %s WHERE id = %%s FOR UPDATE NOWAIT' % self._table,
+                [record.id]
+            )
+    except LockNotAvailable:
+        # Another transaction is processing this record
+        _logger.info("Record %s already being processed, skipping", record.id)
+        return False
 
     # We have the lock - safe to process
-    # ... fetch and process data ...
+    # ... process the record ...
+    return True
+```
+
+**Key points**:
+- `FOR UPDATE NOWAIT` - immediately raises `LockNotAvailable` if record is locked
+- `savepoint(flush=False)` - prevents cache flush before lock attempt
+- This pattern is used throughout Odoo base code for concurrency control
+
+### Batch Processing with Record Locking
+
+```python
+from psycopg2.errors import LockNotAvailable
+
+def batch_process_records(self, records):
+    """Process multiple records, skipping locked ones."""
+    processed = 0
+    skipped = 0
+
+    for record in records:
+        try:
+            with self.env.cr.savepoint(flush=False):
+                # Lock this specific record
+                self.env.cr.execute(
+                    'SELECT * FROM %s WHERE id IN %%s FOR UPDATE NOWAIT' % self._table,
+                    [tuple(record.ids)]
+                )
+
+            # Record is locked - process it
+            record._do_process()
+            processed += 1
+
+        except LockNotAvailable:
+            # Record is locked by another transaction - skip
+            _logger.debug("Record %s locked, skipping", record.id)
+            skipped += 1
+            continue
+
+    return {'processed': processed, 'skipped': skipped}
 ```
 
 ### Alternative: Identity-Based Deduplication
@@ -517,6 +561,21 @@ for amount, ids in value_groups.items():
 | 23514 | CHECK violation | `convert_pgerror_constraint` |
 | 40001 | Serialization failure | Must retry with retry_on_serializable=True |
 | 25P02 | InFailedSqlTransaction | Must rollback |
+| 55P03 | LockNotAvailable | Record locked by another transaction |
+
+### Locking Decision Tree
+
+```
+Need concurrency control?
+├── Record-level locking → SELECT ... FOR UPDATE NOWAIT
+│   ├── Prevent concurrent processing of same record
+│   ├── Use savepoint(flush=False) before SELECT
+│   └── Catch LockNotAvailable exception
+├── Job deduplication → identity_key (queue_job)
+│   └── Only one job per unique key
+└── Batch processing → Group identical values
+    └── Minimize serialization conflicts
+```
 
 ### Savepoint Decision Tree
 
@@ -546,9 +605,10 @@ After catching a database error:
 1. **Always use `with cr.savepoint()`** for operations that might fail
 2. **Never commit() mid-business-logic** unless you know why
 3. **Check for duplicates before creating** rather than catching UniqueViolation
-4. **Use advisory locks** for cron jobs that might overlap
-5. **Group identical updates** to minimize serialization conflicts
-6. **Flush before SQL queries** using `self.flush_model()` or SQL.to_flush
+4. **Use `SELECT ... FOR UPDATE NOWAIT`** for cron jobs that might process same records
+5. **Use `identity_key`** for queue job deduplication
+6. **Group identical updates** to minimize serialization conflicts
+7. **Flush before SQL queries** using `self.flush_model()` or SQL.to_flush
 
 ---
 
@@ -587,7 +647,39 @@ def upsert_by_key(self, key_field, key_value, values):
     return self.create({key_field: key_value, **values})
 ```
 
-### Pattern 3: Retry on Serialization Error
+### Pattern 3: Record Locking (Odoo Standard Pattern)
+
+This is the **standard Odoo pattern** for preventing concurrent record processing:
+
+```python
+from psycopg2.errors import LockNotAvailable
+
+def process_with_lock(self, records):
+    """Process records, skipping those locked by other transactions."""
+    for record in records:
+        try:
+            # Try to acquire exclusive lock on this record
+            with self.env.cr.savepoint(flush=False):
+                self.env.cr.execute(
+                    'SELECT * FROM %s WHERE id IN %%s FOR UPDATE NOWAIT' % self._table,
+                    [tuple(record.ids)]
+                )
+        except LockNotAvailable:
+            # Record is being processed by another transaction
+            _logger.info("Record %s locked, skipping", record.id)
+            continue
+
+        # We have the lock - safe to process
+        record._do_process()
+```
+
+**Key points**:
+- Used throughout Odoo base code (`ir_sequence`, `account_edi`, etc.)
+- `FOR UPDATE NOWAIT` - immediately raises `LockNotAvailable` if locked
+- `savepoint(flush=False)` - prevents cache flush before lock
+- No wait time - immediately fails if record is locked
+
+### Pattern 4: Retry on Serialization Error
 
 ```python
 from odoo import tools
@@ -606,7 +698,7 @@ def update_with_retry(self, records, values, max_retries=3):
             self._cr.execute("SELECT 1")  # Reset transaction state
 ```
 
-### Pattern 4: Flush Before SQL Query
+### Pattern 5: Flush Before SQL Query
 
 ```python
 from odoo.tools import SQL
@@ -636,5 +728,8 @@ def get_aggregated_data(self):
 - `odoo/models.py:7564` - `convert_pgerror_unique()`
 - `odoo/models.py:7618` - `PGERROR_TO_OE` mapping
 - `odoo/tools/sql.py` - Schema operations with savepoints
+- `odoo/addons/base/models/ir_sequence.py:57` - `FOR UPDATE NOWAIT` pattern
+- `odoo/addons/account_edi/models/account_edi_document.py:229` - `FOR UPDATE NOWAIT` pattern
+- `odoo/addons/website_sale/controllers/payment.py:47` - `LockNotAvailable` handling
 - PostgreSQL Documentation: Transaction Isolation, Error Codes
 
