@@ -7,6 +7,7 @@ topics:
   - N+1 query prevention patterns
   - Batch operations (create, write, unlink)
   - Field selection optimization (search_read, load, bin_size)
+  - Aggregation optimization (_read_group core method, read_group for UI)
   - Compute field optimization (store, precompute, avoiding recursion)
   - SQL optimization (when to use, execute_query, SQL class)
   - Clean code patterns (mapped, filtered, sorted)
@@ -15,6 +16,7 @@ when_to_use:
   - Preventing N+1 queries
   - Writing batch operations
   - Optimizing computed fields
+  - Using _read_group() for aggregations
   - Using direct SQL for aggregations
 ---
 
@@ -216,6 +218,100 @@ data = self.search_read(
 records = self.search([('state', '=', 'done')])
 data = records.read(['name', 'amount_total', 'date'])
 ```
+
+### Use _read_group() for Aggregations
+
+**`_read_group()`** is the core aggregation method that `read_group()` calls internally. It returns raw tuples with proper recordsets for relational fields.
+
+```python
+# GOOD: _read_group() returns tuples: [(groupby_value, aggregate1, aggregate2, ...), ...]
+for partner_id, amount_total, count in self._read_group(
+    domain=[('state', '=', 'done')],
+    groupby=['partner_id'],
+    aggregates=['amount_total:sum', 'id:count'],
+):
+    # partner_id: recordset (Many2one field)
+    # amount_total: float
+    # count: int
+    print(f"{partner_id.name}: {amount_total} ({count} orders)")
+```
+
+#### Converting to Dictionary for Efficient Lookup
+
+```python
+# GOOD: Convert _read_group result to dict for O(1) lookup
+# From Odoo base: account_move_line.py
+matching2lines = dict(self._read_group(
+    domain=[('matching_number', 'in', matching_numbers)],
+    groupby=['matching_number'],
+    aggregates=['id:recordset'],
+))
+# Result: {matching_number: lines_recordset, ...}
+```
+
+#### Multiple Groupby Fields
+
+```python
+# GOOD: Multiple groupby fields
+for matching_number, account, lines in self._read_group(
+    domain=[('matching_number', 'in', temp_numbers)],
+    groupby=['matching_number', 'account_id'],
+    aggregates=['id:recordset'],
+):
+    # matching_number: string
+    # account: account.account recordset
+    # lines: account.move.line recordset
+    if all(move.state == 'posted' for move in lines.move_id):
+        # Process grouped lines
+        pass
+```
+
+#### read_group() vs _read_group()
+
+| Feature | `_read_group()` | `read_group()` |
+|---------|-----------------|----------------|
+| Return type | List of tuples | List of dicts |
+| API style | `domain, groupby, aggregates` | `domain, fields, groupby` |
+| Metadata | ❌ No `__domain`, `__context` | ✅ Includes metadata |
+| Lazy grouping | ❌ Not supported | ✅ Supported |
+| Empty group fill | ❌ Not supported | ✅ Supported |
+| Recordsets | ✅ Proper browse records | ✅ Proper browse records |
+| Used internally | ✅ Core method | Wrapper that calls `_read_group()` |
+| Use case | Data processing, internal logic | UI components, reports |
+
+**Key Insight**: `_read_group()` is the **core method** that `read_group()` calls internally (see `odoo/models.py:2888`). Both return proper recordsets for relational fields.
+
+```python
+# _read_group() - Core method, simpler API
+# Returns: [(groupby_val1, agg1, agg2), (groupby_val2, agg1, agg2), ...]
+data = self._read_group(
+    domain=[('state', '=', 'done')],
+    groupby=['partner_id'],
+    aggregates=['amount_total:sum', '__count'],
+)
+
+# read_group() - Public API with metadata
+# Returns: [{'partner_id': (1, 'Name'), 'amount_total': 100, '__domain': [...}, ...]
+data = self.read_group(
+    domain=[('state', '=', 'done')],
+    fields=['amount_total'],
+    groupby=['partner_id'],
+    lazy=True,
+)
+```
+
+**When to use `_read_group()`** (recommended for most cases):
+- Data processing and aggregation
+- Building internal data structures
+- When you don't need `__domain` metadata
+- When you want tuple unpacking for cleaner code
+- **Used extensively in Odoo base code** (400+ files)
+
+**When to use `read_group()`**:
+- UI components that need `__domain` for drill-down
+- Reports with lazy grouping
+- When you need empty group filling
+- Pivot graphs, kanban views
 
 ### Load Parameter for Read
 
@@ -456,11 +552,11 @@ orders.with_context(tracking_disable=True).write({'state': 'done'})
 - [ ] Avoid `search()` inside loops
 - [ ] Use `mapped()` instead of list comprehension for field access
 - [ ] Use `search_read()` when you need dicts, not recordsets
+- [ ] Use `_read_group()` for aggregations (core method; use `read_group()` only when you need `__domain` metadata or lazy grouping for UI)
 - [ ] Store expensive computed fields
 - [ ] Add all dependencies to `@api.depends`
 - [ ] Use `with_context(bin_size=True)` for binary fields
 - [ ] Use `with_context(active_test=False)` when including archived
-- [ ] Use `read_group()` for aggregations (prefer over `_read_group()` - it has lazy grouping and metadata)
 - [ ] Batch create/write/unlink operations
 - [ ] Add indexes on frequently searched fields
 - [ ] Use `filtered()` before operations

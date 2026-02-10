@@ -66,6 +66,10 @@ Specialized agents that act as senior technical leads:
 | Agent | What it does |
 |-------|--------------|
 | **[Odoo Code Review](agents/odoo-code-review/SKILL.md)** | Automatically reviews Odoo code with scoring (1-10) and detailed feedback |
+| **[Odoo Code Tracer](agents/odoo-code-tracer/SKILL.md)** | Traces execution flow from entry point to end, identifying all function calls |
+| **[Odoo Module Generator](agents/odoo-module-generator/SKILL.md)** | Scaffolds complete Odoo 18 modules with proper structure |
+| **[Odoo Query Optimizer](agents/odoo-query-optimizer/SKILL.md)** | Diagnoses N+1 queries and provides optimization suggestions |
+| **[Odoo Migration Helper](agents/odoo-migration-helper/SKILL.md)** | Converts Odoo 16/17 code to Odoo 18 (tree→list, unlink→ondelete, etc.) |
 | **[Planner](agents/planner.md)** | Breaks down complex features into actionable implementation steps |
 
 ### Rules - Coding Standards
@@ -136,7 +140,7 @@ graph LR
 |--------|-------|
 | Documentation | 10,000+ lines |
 | Skill Packs | 8 (Odoo 18.0, 19.0, DTG Base, Payment, Code Review, Brainstorming, Writing, MCP) |
-| Agents | Code Reviewer, Planner |
+| Agents | 6 (Code Review, Tracer, Module Generator, Query Optimizer, Migration Helper, Planner) |
 | License | MIT |
 
 ---

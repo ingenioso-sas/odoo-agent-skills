@@ -4,7 +4,8 @@ description: Complete reference for Odoo 18 ORM model methods, CRUD operations, 
 globs: "**/models/**/*.py"
 topics:
   - Recordset basics (browse, exists, empty)
-  - Search methods (search, search_read, search_count, read_group)
+  - Search methods (search, search_read, search_count)
+  - Aggregation methods (_read_group core, read_group for UI)
   - CRUD operations (create, read, write, unlink)
   - Domain syntax (operators, logical, relational)
   - Environment context (with_context, with_user, with_company)
@@ -13,6 +14,7 @@ when_to_use:
   - Writing ORM queries
   - Performing CRUD operations
   - Building domain filters
+  - Using _read_group() for aggregations
   - Iterating over recordsets
   - Using environment context
 ---
@@ -274,34 +276,68 @@ result = self.read_group(
 # ]
 ```
 
-### _read_group() - Low-Level Internal Method (Odoo 18)
+### _read_group() - Core Aggregation Method (Odoo 18)
 
-**IMPORTANT**: `_read_group()` is a **low-level internal method** used by the ORM. It returns raw tuples without `__domain`, `__context`, or `__range` metadata. Prefer using `read_group()` for typical use cases.
+**`_read_group()`** is the **core aggregation method** that `read_group()` calls internally (see `odoo/models.py:2888`). It returns tuples with proper recordsets for relational fields.
 
 ```python
-# Internal use only - returns list of tuples
-rows = self._read_group(
+# GOOD: _read_group() - simpler API, returns tuples
+for category, amount_total, count in self._read_group(
+    domain=[('state', '=', 'draft')],
+    groupby=['category_id'],
+    aggregates=['amount_total:sum', '__count'],
+    order='category_id'
+):
+    # category: recordset (Many2one field)
+    # amount_total: float
+    # count: int
+    print(f"{category.name}: {amount_total} ({count} orders)")
+
+# Convert to dict for O(1) lookup (pattern from Odoo base)
+category_amounts = dict(self._read_group(
     domain=[('state', '=', 'draft')],
     groupby=['category_id'],
     aggregates=['amount_total:sum'],
-    order='category_id'
-)
-# Result: [(1, 1500.0), (2, 2000.0), ...] - raw tuples
+))
+# Result: {category_recordset: amount_total, ...}
 ```
-
-**When to use `_read_group`**: Rarely, only for low-level custom SQL aggregation where you don't need the extra metadata that `read_group()` provides.
 
 ### read_group() vs _read_group()
 
-| Method | Return Type | Has lazy | Has __domain | When to Use |
-|--------|-------------|---------|--------------|-------------|
-| `read_group()` | List of dicts | Yes | Yes | Most cases - calling aggregation from other models |
-| `_read_group()` | List of tuples | No | No | Low-level internal use only |
+| Method | Return Type | API Parameters | Has lazy | Has __domain | When to Use |
+|--------|-------------|----------------|---------|--------------|-------------|
+| `_read_group()` | List of tuples | `domain, groupby, aggregates` | No | No | Data processing, aggregations (most cases) |
+| `read_group()` | List of dicts | `domain, fields, groupby` | Yes | Yes | UI components, reports with drill-down |
 
-**For extending aggregation behavior**, use these helper methods instead:
+**Key Insight**: `_read_group()` is the **core method** called by `read_group()` internally. Both return proper recordsets for relational fields (via `_read_group_postprocess_groupby`).
+
+```python
+# _read_group() - Core method with simpler API
+for partner, total, count in self._read_group(
+    domain=[('state', '=', 'done')],
+    groupby=['partner_id'],
+    aggregates=['amount_total:sum', '__count'],
+):
+    print(f"{partner.name}: {total} ({count} orders)")
+
+# read_group() - Public API with metadata for UI
+data = self.read_group(
+    domain=[('state', '=', 'done')],
+    fields=['amount_total'],
+    groupby=['partner_id'],
+    lazy=True,
+)
+# Can use __domain for drill-down:
+for group in data:
+    orders = self.search(group['__domain'])
+```
+
+**For extending aggregation behavior**, use these helper methods:
 - `_read_group_expand_states()` - Expand selection groups
 - `_read_group_select()` - Custom aggregate SQL
 - `_read_group_groupby()` - Custom groupby SQL
+- `_read_group_fill_results()` - Fill empty groups
+- `_read_group_format_result()` - Format results with domain
 
 ### group_expand Parameter (Odoo 18)
 
