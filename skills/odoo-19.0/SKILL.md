@@ -5,6 +5,29 @@ globs: "**/*.{py,xml}"
 license: MIT
 author: UncleCat
 version: 1.0.0
+topics:
+  - Actions (ir.actions.*, cron, bindings)
+  - Controllers (HTTP, routing, web endpoints)
+  - Data files (XML/CSV, records, shortcuts)
+  - Decorators (@api.depends, @api.constrains, @api.ondelete)
+  - Development (modules, manifest, wizards, reports)
+  - Field types (Char, Text, Monetary, relational fields)
+  - Manifest (__manifest__.py configuration)
+  - Mixins (mail.thread, activities, aliases, tracking)
+  - Model methods (ORM, CRUD, search, domain)
+  - Migration (upgrading modules, data migration)
+  - OWL components (hooks, services, UI)
+  - Performance (N+1 prevention, optimization)
+  - Reports (QWeb, PDF/HTML, templates)
+  - Security (ACL, record rules, field permissions)
+  - Testing (unit tests, browser tests, mocking)
+  - Transactions (savepoints, errors, serialization)
+  - Translation (i18n, localization, PO files)
+  - Views & XML (list, form, search, QWeb)
+when_to_use:
+  - Finding the appropriate guide for an Odoo 19 task
+  - Understanding module structure and conventions
+  - Looking up best practices for specific Odoo features
 ---
 
 # Odoo 19 Skill - Master Index
@@ -307,6 +330,11 @@ All guides are based on analysis of Odoo 19 source code:
 - `odoo/tools/translate.py` - Translation system
 - `odoo/addons/base/models/res_lang.py` - Language model
 - `addons/web/static/src/core/l10n/translation.js` - JS translations
+
+## External Documentation
+
+- [Odoo 19 Official Documentation](https://github.com/odoo/documentation/tree/19.0) - Official Odoo 19 documentation on GitHub
+- [Odoo 19 Developer Reference](https://github.com/odoo/documentation/blob/19.0/developer/reference/orm.rst) - ORM API reference
 
 ---
 

@@ -1,211 +1,181 @@
-# AI Agents Setup for Odoo 19 Skills
+# Odoo 19 Documentation - AI Agents Setup
 
-This document provides instructions for setting up Odoo 19 skills with various AI IDEs.
+Setup guide for using Odoo 19 documentation with AI coding assistants (Cursor, Claude Code, OpenCode, etc.).
 
-## Claude Code (Cursor/Windsurf)
+## Quick Start
 
-### Step 1: Configure Settings
+### Remote Repository (Recommended)
 
-Create or edit `~/.claude/settings.json`:
+**Cursor IDE** - Configure once:
+- `Settings` → `Rules` → `Add Remote Rule`
+- Source: `Git Repository`
+- URL: `git@github.com:unclecatvn/agent-skills.git`
+- Branch: `odoo/19.0`
+- Subfolder: `agent-skills/skills/odoo/19.0/`
 
-```json
-{
-  "documentation": [
-    "/Users/unclecat/dtg/odoo-skills-19/skills/odoo/19.0/SKILL.md"
-  ]
-}
-```
-
-### Step 2: (Optional) Configure Context Rules
-
-Create `~/.claude/rules/coding-style.md`:
-
-```markdown
-# Odoo 19 Coding Style
-
-Follow Odoo 19 development guidelines from the skills.
-
-## Python
-
-- Use `@api.depends` for computed fields
-- Use `@api.constrains` for validation
-- Use `@api.ondelete` for delete validation (Odoo 19)
-- Use `<list>` not `<tree>` in views
-- Use direct attributes not `attrs`
-
-## XML
-
-- Use `<list>` for list views
-- Use `invisible=""` not `attrs="{'invisible': [...]}"`
-
-## JavaScript
-
-- Use `_t()` for translations
-- Use OWL hooks properly
-```
-
-### Step 3: Verify Installation
-
-In Claude Code terminal:
+### Local Copy
 
 ```bash
-# Test skill loading
-python -c "import sys; print('Claude Code ready')"
+# Clone repository
+git clone git@github.com:unclecatvn/agent-skills.git
+
+# Copy to your project
+cp -r agent-skills/skills/odoo/19.0 /your-project/agent-skills/skills/odoo/
+
+# For Claude Code, create symlink
+ln -s agent-skills/skills/odoo/19.0/CLAUDE.md ./CLAUDE.md
 ```
 
 ---
 
-## Continue.dev
+## Documentation Structure
 
-### Step 1: Create Continue Config
-
-Create `.continuerc.yaml`:
-
-```yaml
-rules:
-  - path: skills/odoo/19.0/SKILL.md
-    type: documentation
 ```
-
-### Step 2: Configure in Continue UI
-
-1. Open Continue
-2. Go to Settings → Config
-3. Add documentation path
-4. Save and reload
+agent-skills/skills/odoo/19.0/
+├── SKILL.md                       # Master index (all agents)
+├── dev/                           # Development guides folder (19 files)
+│   ├── odoo-19-actions-guide.md     # ir.actions.*, cron, bindings
+│   ├── odoo-19-controller-guide.md  # HTTP, routing, controllers
+│   ├── odoo-19-data-guide.md        # XML/CSV data files, records
+│   ├── odoo-19-decorator-guide.md   # @api decorators
+│   ├── odoo-19-development-guide.md # Manifest, wizards (overview)
+│   ├── odoo-19-field-guide.md       # Field types, parameters
+│   ├── odoo-19-manifest-guide.md    # __manifest__.py reference
+│   ├── odoo-19-mixins-guide.md      # mail.thread, activities, etc.
+│   ├── odoo-19-model-guide.md       # ORM, CRUD, search, domain
+│   ├── odoo-19-migration-guide.md   # Migration scripts, hooks
+│   ├── odoo-19-owl-guide.md         # OWL components, services
+│   ├── odoo-19-performance-guide.md # N+1 prevention, optimization
+│   ├── odoo-19-reports-guide.md     # QWeb reports, PDF/HTML
+│   ├── odoo-19-security-guide.md    # ACL, record rules, security
+│   ├── odoo-19-testing-guide.md     # Test classes, decorators
+│   ├── odoo-19-transaction-guide.md # Savepoints, errors
+│   ├── odoo-19-translation-guide.md # Translations, i18n
+│   └── odoo-19-view-guide.md        # XML views, QWeb
+├── CLAUDE.md                      # Claude Code specific
+└── AGENTS.md                      # THIS FILE - setup guide
+```
 
 ---
 
-## Aider
+## Guide Reference
 
-### Step 1: Add to .aider.conf
+| File | Purpose | When to Use |
+|------|---------|-------------|
+| `SKILL.md` | Master index for all guides | Find the right guide for your task |
+| `dev/odoo-19-actions-guide.md` | Actions (window, URL, server, cron) | Creating actions, menus, scheduled jobs |
+| `dev/odoo-19-controller-guide.md` | HTTP controllers, routing | Writing endpoints |
+| `dev/odoo-19-data-guide.md` | XML/CSV data files, records | Creating data files |
+| `dev/odoo-19-decorator-guide.md` | @api decorators usage | Using @api decorators |
+| `dev/odoo-19-development-guide.md` | Module structure, wizards | Creating new modules |
+| `dev/odoo-19-field-guide.md` | Field types, parameters | Defining model fields |
+| `dev/odoo-19-manifest-guide.md` | __manifest__.py reference | Configuring module manifest |
+| `dev/odoo-19-mixins-guide.md` | mail.thread, activities, mixins | Adding messaging, activities |
+| `dev/odoo-19-model-guide.md` | ORM methods, CRUD, domains | Writing model methods |
+| `dev/odoo-19-migration-guide.md` | Migration scripts, hooks | Upgrading modules |
+| `dev/odoo-19-owl-guide.md` | OWL components, hooks, services | Building OWL UI |
+| `dev/odoo-19-performance-guide.md` | Performance optimization | Fixing slow code |
+| `dev/odoo-19-reports-guide.md` | QWeb reports, templates | Creating reports |
+| `dev/odoo-19-security-guide.md` | ACL, record rules, security | Configuring security |
+| `dev/odoo-19-testing-guide.md` | Test classes, decorators, mocking | Writing tests |
+| `dev/odoo-19-transaction-guide.md` | Database transactions, error handling | Savepoints, UniqueViolation |
+| `dev/odoo-19-translation-guide.md` | Translations, localization, i18n | Adding translations |
+| `dev/odoo-19-view-guide.md` | XML views, actions, menus | Writing view XML |
 
-```
-# Add Odoo 19 skills
---add-skills-file
-/Users/unclecat/dtg/odoo-skills-19/skills/odoo/19.0/SKILL.md
-```
+---
 
-### Step 2: Reload Aider
+## AI Agent Configuration
+
+### Cursor IDE
+
+| Setting | Value |
+|---------|-------|
+| Source | Git Repository |
+| URL | `git@github.com:unclecatvn/agent-skills.git` |
+| Branch | `odoo/19.0` |
+| Subfolder | `agent-skills/skills/odoo/19.0/` |
+
+**Globs patterns used by Cursor:**
+
+| File | globs Pattern |
+|------|---------------|
+| `SKILL.md` | `**/*.{py,xml}` |
+| `dev/odoo-19-actions-guide.md` | `**/*.{py,xml}` |
+| `dev/odoo-19-controller-guide.md` | `**/controllers/**/*.py` |
+| `dev/odoo-19-data-guide.md` | `**/*.{xml,csv}` |
+| `dev/odoo-19-decorator-guide.md` | `**/models/**/*.py` |
+| `dev/odoo-19-development-guide.md` | `**/*.{py,xml,csv}` |
+| `dev/odoo-19-field-guide.md` | `**/models/**/*.py` |
+| `dev/odoo-19-manifest-guide.md` | `**/__manifest__.py` |
+| `dev/odoo-19-mixins-guide.md` | `**/models/**/*.py` |
+| `dev/odoo-19-model-guide.md` | `**/models/**/*.py` |
+| `dev/odoo-19-migration-guide.md` | `**/migrations/**/*.py` |
+| `dev/odoo-19-owl-guide.md` | `static/src/**/*.{js,xml}` |
+| `dev/odoo-19-performance-guide.md` | `**/*.{py,xml}` |
+| `dev/odoo-19-reports-guide.md` | `**/report/**/*.xml` |
+| `dev/odoo-19-security-guide.md` | `**/security/**/*.{csv,xml}` |
+| `dev/odoo-19-testing-guide.md` | `**/tests/**/*.py` |
+| `dev/odoo-19-transaction-guide.md` | `**/models/**/*.py` |
+| `dev/odoo-19-translation-guide.md` | `**/*.{py,js,xml}` |
+| `dev/odoo-19-view-guide.md` | `**/views/**/*.xml` |
+
+### Claude Code
 
 ```bash
-aider --reload
+# Place CLAUDE.md in project root
+ln -s agent-skills/skills/odoo/19.0/CLAUDE.md ./CLAUDE.md
 ```
+
+Claude Code reads:
+- `CLAUDE.md` - Project overview and quick reference
+- `SKILL.md` - Master index for all guides
+- Individual guides in `dev/` - Detailed information
+
+### OpenCode
+
+Copy documentation to project - no additional configuration needed.
+
+### Other Agents
+
+| Agent | Setup |
+|-------|-------|
+| Windsurf | Same as Cursor (uses `.mdc` files) |
+| Continue | Place `CLAUDE.md` or `dev/SKILL.md` in root |
+| Aider | Place `CLAUDE.md` or add to prompt |
 
 ---
 
-## Cursor (with Cline)
+## Cursor / Claude Skills Folder
 
-### Step 1: Add to .cursorrules
+For Cursor IDE with local rules, create:
 
 ```
-# Always reference Odoo 19 skills for Odoo development
-When working with Odoo 19 code, always reference the Odoo 19 skills in /Users/unclecat/dtg/odoo-skills-19/skills/odoo/19.0/
+.cursor/skills/
+└── odoo-19/
+    └── SKILL.md -> ../../agent-skills/skills/odoo/19.0/SKILL.md
 ```
 
-### Step 2: Configure .cursorrules
+Or for Claude Code:
 
-Create `.cursorrules` in your project root:
-
-```markdown
-# Odoo 19 Development
-
-For Odoo 19 development tasks, reference the skills at:
-- /Users/unclecat/dtg/odoo-skills-19/skills/odoo/19.0/SKILL.md
-
-Key Odoo 19 changes:
-- Use <list> not <tree>
-- Use direct attributes not attrs
-- Use @api.ondelete for delete validation
 ```
+.claude/skills/
+└── odoo-19/
+    └── SKILL.md -> ../../agent-skills/skills/odoo/19.0/SKILL.md
+```
+
+### Key Odoo 19 Changes
+
+| Change | Old | New |
+|--------|-----|-----|
+| List view tag | `<tree>` | `<list>` |
+| Dynamic attributes | `attrs="{'invisible': [...]}"` | `invisible="..."` |
+| Delete validation | Override `unlink()` | `@api.ondelete(at_uninstall=False)` |
+| Field aggregation | `group_operator=` | `aggregator=` |
 
 ---
 
-## Repo (Continue fork)
+## Repository
 
-### Step 1: Add to Repo Config
+**URL**: `git@github.com:unclecatvn/agent-skills.git`
 
-Create `.repo/config.yaml`:
-
-```yaml
-documentation:
-  - /Users/unclecat/dtg/odoo-skills-19/skills/odoo/19.0/SKILL.md
-```
-
----
-
-## Swirl
-
-### Step 1: Add to Swirl Config
-
-Create `~/.config/swirl/rules.yaml`:
-
-```yaml
-rules:
-  - name: Odoo 19 Development
-    documentation:
-      - /Users/unclecat/dtg/odoo-skills-19/skills/odoo/19.0/SKILL.md
-```
-
----
-
-## Generic Setup (Any AI Tool)
-
-For any AI tool that supports documentation:
-
-1. **Add the SKILL.md path** to your documentation sources
-2. **Optionally add coding-style rules** from `CLAUDE.md`
-3. **Reload/restart** your AI tool
-4. **Test** by asking an Odoo 19 development question
-
-### Example Prompt to Test
-
-```
-How do I create a computed field in Odoo 19 with dotted dependencies?
-```
-
-Expected answer should reference `odoo-19-decorator-guide.md` or `odoo-19-field-guide.md`.
-
----
-
-## Troubleshooting
-
-### Skills Not Loading
-
-1. Verify the path exists
-2. Check file permissions
-3. Ensure SKILL.md is valid YAML front matter
-
-### Outdated Information
-
-1. Pull latest changes from the skills repository
-2. Check version in SKILL.md matches your needs
-
-### Specific IDE Issues
-
-Check your IDE's documentation for:
-- How to configure documentation paths
-- How to reload configuration
-- Any specific syntax requirements
-
----
-
-## Updating Skills
-
-To update the Odoo 19 skills:
-
-```bash
-cd /Users/unclecat/dtg/odoo-skills-19
-git pull origin main
-```
-
-Then reload your AI tool.
-
----
-
-## Feedback
-
-For issues or suggestions:
-1. Check the guide files in `dev/`
-2. Refer to specific guide when reporting issues
-3. Include examples from your codebase
+**License**: MIT

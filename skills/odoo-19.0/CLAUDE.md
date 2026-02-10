@@ -11,7 +11,7 @@ The `skills/odoo/19.0/dev/` directory contains modular guides for Odoo 19 develo
 ```
 skills/odoo/19.0/
 ├── SKILL.md                       # Master index
-├── dev/                           # Development guides (18 files)
+├── dev/                           # Development guides (19 files)
 │   ├── odoo-19-actions-guide.md     # ir.actions.*, cron, bindings
 │   ├── odoo-19-controller-guide.md  # HTTP, routing, controllers
 │   ├── odoo-19-data-guide.md        # XML/CSV data files, records
