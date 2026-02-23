@@ -6,12 +6,12 @@ This file provides guidance to AI agents when working with Odoo 19 code in this 
 
 ## Documentation Structure
 
-The `skills/odoo/19.0/dev/` directory contains modular guides for Odoo 19 development:
+The `skills/odoo-19.0/references/` directory contains modular guides for Odoo 19 development:
 
 ```
-skills/odoo/19.0/
+skills/odoo-19.0/
 ├── SKILL.md                       # Master index
-├── dev/                           # Development guides (19 files)
+├── references/                    # Development guides (18 files)
 │   ├── odoo-19-actions-guide.md     # ir.actions.*, cron, bindings
 │   ├── odoo-19-controller-guide.md  # HTTP, routing, controllers
 │   ├── odoo-19-data-guide.md        # XML/CSV data files, records
@@ -38,24 +38,24 @@ skills/odoo/19.0/
 
 | Task | Guide |
 |------|-------|
-| Creating actions, menus, cron jobs | `dev/odoo-19-actions-guide.md` |
-| Creating a new module | `dev/odoo-19-development-guide.md` |
-| Configuring __manifest__.py | `dev/odoo-19-manifest-guide.md` |
-| Creating XML/CSV data files | `dev/odoo-19-data-guide.md` |
-| Writing ORM queries/search | `dev/odoo-19-model-guide.md` |
-| Defining model fields | `dev/odoo-19-field-guide.md` |
-| Using @api decorators | `dev/odoo-19-decorator-guide.md` |
-| Writing XML views | `dev/odoo-19-view-guide.md` |
-| Fixing slow code/N+1 queries | `dev/odoo-19-performance-guide.md` |
-| Handling database errors | `dev/odoo-19-transaction-guide.md` |
-| Creating HTTP endpoints | `dev/odoo-19-controller-guide.md` |
-| Building OWL components | `dev/odoo-19-owl-guide.md` |
-| Upgrading modules/migrating data | `dev/odoo-19-migration-guide.md` |
-| Using mail.thread, activities, mixins | `dev/odoo-19-mixins-guide.md` |
-| Creating QWeb reports | `dev/odoo-19-reports-guide.md` |
-| Configuring security (ACL, rules) | `dev/odoo-19-security-guide.md` |
-| Writing tests | `dev/odoo-19-testing-guide.md` |
-| Adding translations/localization | `dev/odoo-19-translation-guide.md` |
+| Creating actions, menus, cron jobs | `references/odoo-19-actions-guide.md` |
+| Creating a new module | `references/odoo-19-development-guide.md` |
+| Configuring __manifest__.py | `references/odoo-19-manifest-guide.md` |
+| Creating XML/CSV data files | `references/odoo-19-data-guide.md` |
+| Writing ORM queries/search | `references/odoo-19-model-guide.md` |
+| Defining model fields | `references/odoo-19-field-guide.md` |
+| Using @api decorators | `references/odoo-19-decorator-guide.md` |
+| Writing XML views | `references/odoo-19-view-guide.md` |
+| Fixing slow code/N+1 queries | `references/odoo-19-performance-guide.md` |
+| Handling database errors | `references/odoo-19-transaction-guide.md` |
+| Creating HTTP endpoints | `references/odoo-19-controller-guide.md` |
+| Building OWL components | `references/odoo-19-owl-guide.md` |
+| Upgrading modules/migrating data | `references/odoo-19-migration-guide.md` |
+| Using mail.thread, activities, mixins | `references/odoo-19-mixins-guide.md` |
+| Creating QWeb reports | `references/odoo-19-reports-guide.md` |
+| Configuring security (ACL, rules) | `references/odoo-19-security-guide.md` |
+| Writing tests | `references/odoo-19-testing-guide.md` |
+| Adding translations/localization | `references/odoo-19-translation-guide.md` |
 
 ## Key Odoo 19 Changes
 

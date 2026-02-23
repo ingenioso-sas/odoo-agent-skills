@@ -231,6 +231,62 @@ READ_GROUP_AGGREGATE = {
 <field_name>.<property>:<granularity>  # e.g., "date_deadline:month"
 ```
 
+### Aggregate Functions Reference
+
+| Aggregate | Description | Example | Result Type |
+|-----------|-------------|---------|-------------|
+| `__count` | **Count records per group** (special, no field prefix) | `'__count'` | `int` |
+| `field:sum` | Sum of field values | `'amount:sum'` | `float`/`int` |
+| `field:avg` | Average of field values | `'price:avg'` | `float` |
+| `field:max` | Maximum field value | `'date:max'` | field type |
+| `field:min` | Minimum field value | `'date:min'` | field type |
+| `field:count` | Count non-null values in field | `'partner_id:count'` | `int` |
+| `field:count_distinct` | Count distinct non-null values | `'state:count_distinct'` | `int` |
+| `field:bool_and` | True if all values are true | `'is_active:bool_and'` | `bool` |
+| `field:bool_or` | True if any value is true | `'is_paid:bool_or'` | `bool` |
+| `field:array_agg` | Array of all values | `'tag_id:array_agg'` | `list` |
+| `field:recordset` | Recordset of all records | `'id:recordset'` | `recordset` |
+
+#### `__count` - Special Count Aggregate
+
+**`__count`** is a **special aggregate** that counts all records in each group, regardless of field values. It does NOT require a field prefix.
+
+```python
+# GOOD: __count - counts all records per group
+for category, amount_total, count in self._read_group(
+    domain=[('state', '=', 'draft')],
+    groupby=['category_id'],
+    aggregates=['amount_total:sum', '__count'],  # __count: no field prefix!
+):
+    print(f"{category.name}: {amount_total} ({count} orders)")
+    # count = total number of records in this group
+
+# BAD: field:count - only counts non-null values
+for category, amount_total, count in self._read_group(
+    domain=[('state', '=', 'draft')],
+    groupby=['category_id'],
+    aggregates=['amount_total:sum', 'amount_total:count'],
+):
+    # count = only counts records where amount_total IS NOT NULL
+```
+
+**Key Difference**:
+- `__count` → Counts ALL records in group (like `COUNT(*)`)
+- `field:count` → Counts NON-NULL values only (like `COUNT(field)`)
+- `field:count_distinct` → Counts distinct non-null values (like `COUNT(DISTINCT field)`)
+
+```python
+# Example: Count vs count_distinct
+self._read_group(
+    domain=[('state', '=', 'done')],
+    groupby=['partner_id'],
+    aggregates=['__count', 'state:count', 'state:count_distinct'],
+)
+# __count = total orders per partner
+# state:count = orders where state IS NOT NULL (same as __count here)
+# state:count_distinct = distinct state values per partner (always 1 here)
+```
+
 ### _read_group_select (Odoo 18)
 
 Internal method to generate SQL for aggregation.
