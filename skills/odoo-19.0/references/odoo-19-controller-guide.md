@@ -3,6 +3,7 @@
 Guide for creating HTTP controllers and routes in Odoo 19.
 
 ## Table of Contents
+
 - [Controllers](#controllers)
 - [Routes](#routes)
 - [Request](#request)
@@ -40,6 +41,7 @@ class Extension(MyController):
 ```
 
 **Important**:
+
 - Always re-apply `@http.route()` decorator to keep route visible
 - Without decorator, method is "unpublished"
 - Decorator arguments override previous ones
@@ -71,15 +73,15 @@ def hello(self):
 
 ### Route Parameters
 
-| Parameter | Description |
-|-----------|-------------|
-| `route` | Route path(s) (string or list) |
-| `auth` | Authentication type (`public`, `user`, `none`) |
-| `methods` | Allowed HTTP methods (`GET`, `POST`, etc.) |
-| `type` | Response type (`http`, `json`) |
-| `website` | Boolean: bind to current website |
-| `csrf` | Boolean: CSRF protection (default: True) |
-| `sitemap` | Boolean or sitemap config |
+| Parameter | Description                                    |
+| --------- | ---------------------------------------------- |
+| `route`   | Route path(s) (string or list)                 |
+| `auth`    | Authentication type (`public`, `user`, `none`) |
+| `methods` | Allowed HTTP methods (`GET`, `POST`, etc.)     |
+| `type`    | Response type (`http`, `json`)                 |
+| `website` | Boolean: bind to current website               |
+| `csrf`    | Boolean: CSRF protection (default: True)       |
+| `sitemap` | Boolean or sitemap config                      |
 
 ### Multiple Routes
 
@@ -107,12 +109,12 @@ def post_data(self, **kwargs):
 
 ### Authentication Types
 
-| Type | Description |
-|------|-------------|
-| `public` | No authentication required |
-| `user` | Requires active user session |
-| `none` | No authentication, no session |
-| `website` | Public with website support |
+| Type      | Description                   |
+| --------- | ----------------------------- |
+| `public`  | No authentication required    |
+| `user`    | Requires active user session  |
+| `none`    | No authentication, no session |
+| `website` | Public with website support   |
 
 ### Examples
 
@@ -151,17 +153,17 @@ The request object is automatically set on `odoo.http.request` at the start of e
 
 ### Request Properties
 
-| Property | Description |
-|----------|-------------|
-| `httprequest` | Original Werkzeug request |
-| `env` | Odoo environment for current request |
-| `db` | Current database |
-| `uid` | Current user id |
-| `context` | Request context |
-| `session` | Session |
-| `cr` | Database cursor |
-| `lang` | Current language |
-| `registry` | Model registry |
+| Property      | Description                          |
+| ------------- | ------------------------------------ |
+| `httprequest` | Original Werkzeug request            |
+| `env`         | Odoo environment for current request |
+| `db`          | Current database                     |
+| `uid`         | Current user id                      |
+| `context`     | Request context                      |
+| `session`     | Session                              |
+| `cr`          | Database cursor                      |
+| `lang`        | Current language                     |
+| `registry`    | Model registry                       |
 
 ### Example
 
@@ -254,12 +256,12 @@ def json_search(self, model, domain, fields=None):
 ### Call from JavaScript
 
 ```javascript
-rpc('/api/search', {
-    model: 'res.partner',
-    domain: [['is_company', '=', true]],
-    fields: ['name', 'email']
-}).then(function(result) {
-    console.log(result);
+rpc("/api/search", {
+  model: "res.partner",
+  domain: [["is_company", "=", true]],
+  fields: ["name", "email"],
+}).then(function (result) {
+  console.log(result);
 });
 ```
 
@@ -285,7 +287,7 @@ class WebsiteController(http.Controller):
     <t t-call="website.layout">
         <div id="wrap">
             <div class="oe_structure"/>
-            <h1 t-esc="title"/>
+            <h1 t-out="title"/>
             <div class="oe_structure"/>
         </div>
     </t>

@@ -3,6 +3,7 @@
 Guide for adding translations and localization in Odoo 19: Python, JavaScript, and QWeb templates.
 
 ## Table of Contents
+
 - [Translation Overview](#translation-overview)
 - [Python Translations](#python-translations)
 - [JavaScript Translations](#javascript-translations)
@@ -16,6 +17,7 @@ Guide for adding translations and localization in Odoo 19: Python, JavaScript, a
 ## Translation Overview
 
 Odoo supports multi-language through:
+
 - Python `_()` function
 - JavaScript `_t()` function
 - Translatable fields
@@ -23,11 +25,11 @@ Odoo supports multi-language through:
 
 ### Supported File Formats
 
-| Format | Use |
-|--------|-----|
-| `.po` | Portable Object (main format) |
-| `.pot` | Portable Object Template |
-| `.csv` | For some data imports |
+| Format | Use                           |
+| ------ | ----------------------------- |
+| `.po`  | Portable Object (main format) |
+| `.pot` | Portable Object Template      |
+| `.csv` | For some data imports         |
 
 ---
 
@@ -97,7 +99,7 @@ const message = _t("Hello World");
 ### Translation with Parameters
 
 ```javascript
-const message = _t("Hello %(name)s", {name: "John"});
+const message = _t("Hello %(name)s", { name: "John" });
 ```
 
 ### Lazy Translation
@@ -114,7 +116,7 @@ const lt = lazyTranslation(() => _t("Error occurred"));
 import { _lt } from "@web/core/l10n/translation";
 
 class MyClass {
-    errorMessage = _lt("Error occurred");
+  errorMessage = _lt("Error occurred");
 }
 ```
 
@@ -134,7 +136,7 @@ class MyClass {
 
 ```xml
 <template id="my_template">
-    <h1><t t-esc="translate('Hello World')"/></h1>
+    <h1><t t-out="translate('Hello World')"/></h1>
 </template>
 ```
 
@@ -206,6 +208,7 @@ odoo-bin -d mydb -l fr --i18n-export=fr --stop-after-init
 ```
 
 **Via UI**:
+
 1. Settings → Translations → Export Translations
 2. Select language
 3. Choose file format (PO)
@@ -220,6 +223,7 @@ odoo-bin -d mydb -l fr --i18n-import=/path/to/fr.po --stop-after-init
 ```
 
 **Via UI**:
+
 1. Settings → Translations → Import Translations
 2. Select language
 3. Upload PO file
@@ -307,14 +311,14 @@ message = _("Hello %(name)s!") % {'name': name}
 
 ## Common Translation Terms
 
-| English | French | German | Spanish |
-|---------|--------|--------|---------|
-| Save | Enregistrer | Speichern | Guardar |
-| Cancel | Annuler | Abbrechen | Cancelar |
-| Delete | Supprimer | Löschen | Eliminar |
-| Edit | Modifier | Bearbeiten | Editar |
-| Create | Créer | Erstellen | Crear |
-| Search | Rechercher | Suchen | Buscar |
+| English | French      | German     | Spanish  |
+| ------- | ----------- | ---------- | -------- |
+| Save    | Enregistrer | Speichern  | Guardar  |
+| Cancel  | Annuler     | Abbrechen  | Cancelar |
+| Delete  | Supprimer   | Löschen    | Eliminar |
+| Edit    | Modifier    | Bearbeiten | Editar   |
+| Create  | Créer       | Erstellen  | Crear    |
+| Search  | Rechercher  | Suchen     | Buscar   |
 
 ---
 

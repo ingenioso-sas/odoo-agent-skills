@@ -3,6 +3,7 @@
 Guide for building OWL (Owl Web Library) components in Odoo 19.
 
 ## Table of Contents
+
 - [OWL Overview](#owl-overview)
 - [Component Structure](#component-structure)
 - [Hooks](#hooks)
@@ -19,13 +20,13 @@ OWL is a JavaScript framework for building web UI components in Odoo.
 
 ### Key Concepts
 
-| Concept | Description |
-|---------|-------------|
+| Concept       | Description                |
+| ------------- | -------------------------- |
 | **Component** | Reusable UI building block |
-| **State** | Reactive data |
-| **Props** | Component properties |
-| **Hooks** | Lifecycle functions |
-| **Template** | QWeb template |
+| **State**     | Reactive data              |
+| **Props**     | Component properties       |
+| **Hooks**     | Lifecycle functions        |
+| **Template**  | QWeb template              |
 
 ---
 
@@ -37,14 +38,14 @@ OWL is a JavaScript framework for building web UI components in Odoo.
 import { Component } from "@odoo/owl";
 
 export class MyComponent extends Component {
-    static template = "my_module.MyComponent";
-    static props = {
-        value: { type: String, optional: true },
-    };
+  static template = "my_module.MyComponent";
+  static props = {
+    value: { type: String, optional: true },
+  };
 
-    setup() {
-        // Component setup
-    }
+  setup() {
+    // Component setup
+  }
 }
 ```
 
@@ -84,14 +85,14 @@ setup() {
 
 ### Lifecycle Hooks
 
-| Hook | When |
-|------|------|
-| `setup()` | Component creation |
-| `onWillStart()` | Before render (async) |
-| `onMounted()` | After render |
-| `onWillUnmount()` | Before destroy |
-| `onWillPatch()` | Before update |
-| `onPatched()` | After update |
+| Hook              | When                  |
+| ----------------- | --------------------- |
+| `setup()`         | Component creation    |
+| `onWillStart()`   | Before render (async) |
+| `onMounted()`     | After render          |
+| `onWillUnmount()` | Before destroy        |
+| `onWillPatch()`   | Before update         |
+| `onPatched()`     | After update          |
 
 ### Example
 
@@ -121,16 +122,16 @@ onWillUnmount() {
 
 ### Common Services
 
-| Service | Description |
-|---------|-------------|
-| `orm` | Database operations |
-| `rpc` | RPC calls |
-| `action` | Execute actions |
-| `dialog` | Show dialogs |
-| `notification` | Show notifications |
-| `router` | Navigation |
-| `user` | Current user |
-| `company` | Current company |
+| Service        | Description         |
+| -------------- | ------------------- |
+| `orm`          | Database operations |
+| `rpc`          | RPC calls           |
+| `action`       | Execute actions     |
+| `dialog`       | Show dialogs        |
+| `notification` | Show notifications  |
+| `router`       | Navigation          |
+| `user`         | Current user        |
+| `company`      | Current company     |
 
 ### Use Service
 
@@ -154,10 +155,10 @@ const records = await this.orm.search("my.model", [["active", "=", true]]);
 const data = await this.orm.read("my.model", ids, ["name", "value"]);
 
 // Create
-const id = await this.orm.create("my.model", {name: "Test"});
+const id = await this.orm.create("my.model", { name: "Test" });
 
 // Write
-await this.orm.write("my.model", [id], {name: "Updated"});
+await this.orm.write("my.model", [id], { name: "Updated" });
 
 // Unlink
 await this.orm.unlink("my.model", [id]);
@@ -167,7 +168,7 @@ await this.orm.unlink("my.model", [id]);
 
 ```javascript
 // Call controller
-const result = await this.rpc("/my/controller", {param: "value"});
+const result = await this.rpc("/my/controller", { param: "value" });
 ```
 
 ### Action Service
@@ -175,9 +176,12 @@ const result = await this.rpc("/my/controller", {param: "value"});
 ```javascript
 // Do action
 await this.action.doAction({
-    type: "ir.actions.act_window",
-    res_model: "my.model",
-    views: [[false, "list"], [false, "form"]],
+  type: "ir.actions.act_window",
+  res_model: "my.model",
+  views: [
+    [false, "list"],
+    [false, "form"],
+  ],
 });
 ```
 
@@ -196,8 +200,8 @@ this.dialog.add(MyDialog, {
 ```javascript
 // Show notification
 this.notification.notify({
-    message: "Success!",
-    type: "success",
+  message: "Success!",
+  type: "success",
 });
 ```
 
@@ -223,7 +227,7 @@ increment() {
 ### useState in Template
 
 ```xml
-<div t-esc="state.count"/>
+<div t-out="state.count"/>
 <button t-on-click="increment">+</button>
 ```
 
@@ -247,8 +251,8 @@ setup() {
 <templates xml:space="preserve">
     <t t-name="my_module.MyComponent" owl="1">
         <div class="my_component">
-            <h1 t-esc="props.title"/>
-            <p t-esc="state.message"/>
+            <h1 t-out="props.title"/>
+            <p t-out="state.message"/>
         </div>
     </t>
 </templates>
@@ -266,7 +270,7 @@ setup() {
 ```xml
 <!-- Loop -->
 <div t-foreach="state.records" t-as="record" t-key="record.id">
-    <span t-esc="record.name"/>
+    <span t-out="record.name"/>
 </div>
 
 <!-- Condition -->
@@ -289,13 +293,13 @@ this.message = _t("Hello World");
 ### Translate with Parameters
 
 ```javascript
-this.message = _t("Hello %(name)s", {name: "John"});
+this.message = _t("Hello %(name)s", { name: "John" });
 ```
 
 ### Translate in Template
 
 ```xml
-<span t-esc="translate('Hello World')"/>
+<span t-out="translate('Hello World')"/>
 ```
 
 ---
@@ -309,19 +313,19 @@ import { Component, useState } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 
 export class Counter extends Component {
-    static template = "my_module.Counter";
+  static template = "my_module.Counter";
 
-    setup() {
-        this.state = useState({count: 0});
-    }
+  setup() {
+    this.state = useState({ count: 0 });
+  }
 
-    increment() {
-        this.state.count++;
-    }
+  increment() {
+    this.state.count++;
+  }
 
-    decrement() {
-        this.state.count--;
-    }
+  decrement() {
+    this.state.count--;
+  }
 }
 ```
 
@@ -330,7 +334,7 @@ export class Counter extends Component {
     <t t-name="my_module.Counter" owl="1">
         <div class="counter">
             <button class="btn btn-secondary" t-on-click="decrement">-</button>
-            <span t-esc="state.count"/>
+            <span t-out="state.count"/>
             <button class="btn btn-secondary" t-on-click="increment">+</button>
         </div>
     </t>
@@ -344,24 +348,24 @@ import { Component, useState, onWillStart } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 export class DataComponent extends Component {
-    static template = "my_module.DataComponent";
+  static template = "my_module.DataComponent";
 
-    setup() {
-        this.orm = useService("orm");
-        this.state = useState({
-            records: [],
-            loading: true,
-        });
+  setup() {
+    this.orm = useService("orm");
+    this.state = useState({
+      records: [],
+      loading: true,
+    });
 
-        onWillStart(this.loadData);
-    }
+    onWillStart(this.loadData);
+  }
 
-    async loadData() {
-        this.state.records = await this.orm.search("my.model", [], {
-            limit: 10,
-        });
-        this.state.loading = false;
-    }
+  async loadData() {
+    this.state.records = await this.orm.search("my.model", [], {
+      limit: 10,
+    });
+    this.state.loading = false;
+  }
 }
 ```
 
@@ -400,12 +404,12 @@ Keep components small and focused.
 ```javascript
 // Good: Small focused component
 export class UserName extends Component {
-    static template = "my_module.UserName";
+  static template = "my_module.UserName";
 }
 
 // Bad: Large monolithic component
 export class Everything extends Component {
-    static template = "my_module.Everything";
+  static template = "my_module.Everything";
 }
 ```
 

@@ -3,6 +3,7 @@
 Guide for using `@api` decorators in Odoo 19: computed fields, validation, onchange, and more.
 
 ## Table of Contents
+
 - [Method Decorators](#method-decorators)
 - [@api.depends](#apidepends)
 - [@api.constrains](#apiconstrains)
@@ -11,6 +12,7 @@ Guide for using `@api` decorators in Odoo 19: computed fields, validation, oncha
 - [@api.model](#apimodel)
 - [@api.model_create_multi](#apimodel_create_multi)
 - [@api.autovacuum](#apiautovacuum)
+- [@api.private](#apiprivate)
 - [@api_returns](#apireturns)
 
 ---
@@ -170,8 +172,8 @@ def _unlink_if_not_draft(self):
 
 ### Parameters
 
-| Parameter | Description |
-|-----------|-------------|
+| Parameter      | Description                                            |
+| -------------- | ------------------------------------------------------ |
 | `at_uninstall` | If `False`, allows deletion when module is uninstalled |
 
 ### Why Use @api.ondelete?
@@ -320,7 +322,51 @@ Need to define field behavior?
 
 Need to define method behavior?
 ├── Method-level, doesn't depend on self → @api.model
+├── Mark method as non-RPC callable → @api.private
 └── Normal record method → no decorator needed
+```
+
+---
+
+## @api.private
+
+New in Odoo 19. Marks a method as **not callable via RPC** (external API).
+
+### Usage
+
+```python
+from odoo import api, models
+
+class MyModel(models.Model):
+    _name = 'my.model'
+
+    @api.private
+    def _internal_computation(self):
+        """This method cannot be called via XML-RPC/JSON-RPC."""
+        return self._do_heavy_work()
+
+    def public_action(self):
+        """This method CAN be called via RPC."""
+        return self._internal_computation()
+```
+
+### When to Use
+
+- Methods that should only be called internally (not via API/button)
+- Replaces the convention of prefixing with `_` for security-critical methods
+- ORM override methods that you don't want exposed
+
+### @api.private vs Underscore Convention
+
+```python
+# Convention: underscore prefix = private (but NOT enforced by ORM)
+def _do_stuff(self):  # Cannot be called from action buttons, but still convention-based
+    pass
+
+# Odoo 19: @api.private = explicitly enforced by framework
+@api.private
+def compute_sensitive_data(self):  # Name doesn't need underscore
+    pass
 ```
 
 ---

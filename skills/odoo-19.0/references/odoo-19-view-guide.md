@@ -3,6 +3,7 @@
 Guide for creating views in Odoo 19: list, form, search, kanban, calendar, graph, pivot, and QWeb templates.
 
 ## Table of Contents
+
 - [View Types](#view-types)
 - [List Views](#list-views)
 - [Form Views](#form-views)
@@ -18,17 +19,17 @@ Guide for creating views in Odoo 19: list, form, search, kanban, calendar, graph
 
 ## View Types
 
-| Type | Tag | Description |
-|------|-----|-------------|
-| List | `<list>` | Table view (formerly `<tree>`) |
-| Form | `<form>` | Single record view |
-| Search | `<search>` | Search/filter view |
-| Kanban | `<kanban>` | Card-based view |
-| Calendar | `<calendar>` | Calendar view |
-| Graph | `<graph>` | Chart view |
-| Pivot | `<pivot>` | Pivot table view |
-| Activity | `<activity>` | Activity view |
-| QWeb | `<template>` | HTML/PDF template |
+| Type     | Tag          | Description                    |
+| -------- | ------------ | ------------------------------ |
+| List     | `<list>`     | Table view (formerly `<tree>`) |
+| Form     | `<form>`     | Single record view             |
+| Search   | `<search>`   | Search/filter view             |
+| Kanban   | `<kanban>`   | Card-based view                |
+| Calendar | `<calendar>` | Calendar view                  |
+| Graph    | `<graph>`    | Chart view                     |
+| Pivot    | `<pivot>`    | Pivot table view               |
+| Activity | `<activity>` | Activity view                  |
+| QWeb     | `<template>` | HTML/PDF template              |
 
 ---
 
@@ -59,12 +60,12 @@ Guide for creating views in Odoo 19: list, form, search, kanban, calendar, graph
 </list>
 ```
 
-| Option | Description |
-|---------|-------------|
-| `editable` | `top` or `bottom`: inline editing |
-| `multi_edit` | Enable multi-row editing |
-| `limit` | Default records per page |
-| `create` | Show create button (default: true) |
+| Option       | Description                        |
+| ------------ | ---------------------------------- |
+| `editable`   | `top` or `bottom`: inline editing  |
+| `multi_edit` | Enable multi-row editing           |
+| `limit`      | Default records per page           |
+| `create`     | Show create button (default: true) |
 
 ### Decoration
 
@@ -77,15 +78,15 @@ Guide for creating views in Odoo 19: list, form, search, kanban, calendar, graph
 </list>
 ```
 
-| Decoration | Description |
-|-------------|-------------|
-| `decoration-success` | Green |
+| Decoration           | Description   |
+| -------------------- | ------------- |
+| `decoration-success` | Green         |
 | `decoration-warning` | Yellow/Orange |
-| `decoration-danger` | Red |
-| `decoration-info` | Blue |
-| `decoration-muted` | Grey |
-| `decoration-bf` | Bold font |
-| `decoration-it` | Italic font |
+| `decoration-danger`  | Red           |
+| `decoration-info`    | Blue          |
+| `decoration-muted`   | Grey          |
+| `decoration-bf`      | Bold font     |
+| `decoration-it`      | Italic font   |
 
 ### Optional Fields
 
@@ -142,11 +143,11 @@ Guide for creating views in Odoo 19: list, form, search, kanban, calendar, graph
 </form>
 ```
 
-| Attribute | Description |
-|-----------|-------------|
-| `create` | Show create button |
-| `edit` | Show edit button |
-| `delete` | Show delete button |
+| Attribute | Description        |
+| --------- | ------------------ |
+| `create`  | Show create button |
+| `edit`    | Show edit button   |
+| `delete`  | Show delete button |
 
 ### Chatter
 
@@ -252,7 +253,7 @@ Or use shortcut:
             <field name="name"/>
             <field name="state"/>
             <templates>
-                <t t-name="kanban-box">
+                <t t-name="card">
                     <div class="oe_kanban_card">
                         <div class="oe_kanban_content">
                             <strong><field name="name"/></strong>
@@ -274,7 +275,7 @@ Or use shortcut:
     <field name="priority"/>
     <field name="state"/>
     <templates>
-        <t t-name="kanban-box">
+        <t t-name="card">
             <div class="oe_kanban_card">
                 <div class="oe_kanban_content">
                     <field name="name"/>
@@ -304,13 +305,13 @@ Or use shortcut:
 </record>
 ```
 
-| Attribute | Description |
-|-----------|-------------|
-| `date_start` | Start date field |
-| `date_end` | End date field |
+| Attribute    | Description                              |
+| ------------ | ---------------------------------------- |
+| `date_start` | Start date field                         |
+| `date_end`   | End date field                           |
 | `date_delay` | Duration field (alternative to date_end) |
-| `color` | Field for color |
-| `mode` | Default view (month, week, day) |
+| `color`      | Field for color                          |
+| `mode`       | Default view (month, week, day)          |
 
 ---
 
@@ -332,10 +333,10 @@ Or use shortcut:
 </record>
 ```
 
-| Attribute | Description |
-|-----------|-------------|
-| `type` | `bar`, `pie`, `line` |
-| `stacked` | Stack bars |
+| Attribute | Description          |
+| --------- | -------------------- |
+| `type`    | `bar`, `pie`, `line` |
+| `stacked` | Stack bars           |
 
 ---
 
@@ -378,12 +379,12 @@ Or use shortcut:
 
 ### Position Options
 
-| Position | Description |
-|----------|-------------|
-| `inside` | Inside element |
-| `replace` | Replace element |
-| `before` | Before element |
-| `after` | After element |
+| Position     | Description       |
+| ------------ | ----------------- |
+| `inside`     | Inside element    |
+| `replace`    | Replace element   |
+| `before`     | Before element    |
+| `after`      | After element     |
 | `attributes` | Modify attributes |
 
 ### Example: Add Field
@@ -436,19 +437,18 @@ Or use shortcut:
 
 ### QWeb Directives
 
-| Directive | Description |
-|-----------|-------------|
-| `t-esc` | Escape and output |
-| `t-raw` | Output raw (XSS risk) |
-| `t-field` | Output formatted field |
-| `t-if` | Conditional |
-| `t-elif` | Else if |
-| `t-else` | Else |
-| `t-foreach` | Loop |
-| `t-as` | Loop variable |
-| `t-set` | Set variable |
-| `t-call` | Call template |
-| `t-att-*` | Set attribute |
+| Directive   | Description                                     |
+| ----------- | ----------------------------------------------- |
+| `t-out`     | Escape and output (replaces deprecated `t-esc`) |
+| `t-field`   | Output formatted field                          |
+| `t-if`      | Conditional                                     |
+| `t-elif`    | Else if                                         |
+| `t-else`    | Else                                            |
+| `t-foreach` | Loop                                            |
+| `t-as`      | Loop variable                                   |
+| `t-set`     | Set variable                                    |
+| `t-call`    | Call template                                   |
+| `t-att-*`   | Set attribute                                   |
 
 ---
 

@@ -3,6 +3,7 @@
 Guide for Odoo 19 security: access rights, record rules, field permissions, and security pitfalls.
 
 ## Table of Contents
+
 - [Security Overview](#security-overview)
 - [Groups](#groups)
 - [Access Rights (ACL)](#access-rights-acl)
@@ -27,25 +28,42 @@ Both are linked to users through **groups**.
 
 `res.groups` - Users belong to groups, security mechanisms are associated to groups.
 
+> **Odoo 19 Breaking Change**: `category_id` has been **removed** from `res.groups`. Replaced by a new **privilege-based system** using `res.groups.privilege`.
+
 ### Key Attributes
 
-| Attribute | Description |
-|-----------|-------------|
-| `name` | User-readable identification (role/purpose) |
-| `category_id` | Module category, associates groups with an Odoo App |
-| `implied_ids` | Other groups to set on the user alongside this one |
-| `comment` | Additional notes |
+| Attribute      | Description                                                               |
+| -------------- | ------------------------------------------------------------------------- |
+| `name`         | User-readable identification (role/purpose)                               |
+| `privilege_id` | **Odoo 19**: Reference to `res.groups.privilege` (replaces `category_id`) |
+| `implied_ids`  | Other groups to set on the user alongside this one                        |
+| `comment`      | Additional notes                                                          |
+
+### 3-Tier Security Architecture (Odoo 19)
+
+```
+ir.module.category → res.groups.privilege → res.groups → res.users
+```
 
 ### Example
 
-```python
+```xml
+<!-- Step 1: Define privilege -->
+<record id="privilege_my_module" model="res.groups.privilege">
+    <field name="name">My Module Access</field>
+    <field name="category_id" ref="base.module_category_my_module"/>
+</record>
+
+<!-- Step 2: Define group with privilege -->
 <record id="group_my_module_user" model="res.groups">
     <field name="name">My Module User</field>
-    <field name="category_id" ref="base.module_category_my_module"/>
+    <field name="privilege_id" ref="privilege_my_module"/>
     <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
     <field name="comment">Users can access my module features.</field>
 </record>
 ```
+
+> **Migration**: Replace `category_id` with `privilege_id` in `security.xml` and create corresponding `res.groups.privilege` records.
 
 ---
 
@@ -59,15 +77,15 @@ Access rights are **additive** - a user's accesses are the union of all groups.
 
 ### Key Attributes
 
-| Attribute | Description |
-|-----------|-------------|
-| `name` | Purpose or role of the group |
-| `model_id` | Model whose access the ACL controls |
-| `group_id` | Group granted access (empty = every user) |
-| `perm_create` | Grant create access |
-| `perm_read` | Grant read access |
-| `perm_write` | Grant write access |
-| `perm_unlink` | Grant unlink (delete) access |
+| Attribute     | Description                               |
+| ------------- | ----------------------------------------- |
+| `name`        | Purpose or role of the group              |
+| `model_id`    | Model whose access the ACL controls       |
+| `group_id`    | Group granted access (empty = every user) |
+| `perm_create` | Grant create access                       |
+| `perm_read`   | Grant read access                         |
+| `perm_write`  | Grant write access                        |
+| `perm_unlink` | Grant unlink (delete) access              |
 
 ### Example CSV (Common Format)
 
@@ -105,21 +123,21 @@ Record rules are **default-allow**: if access rights grant access and no rule ap
 
 ### Key Attributes
 
-| Attribute | Description |
-|-----------|-------------|
-| `name` | Description of the rule |
-| `model_id` | Model to which the rule applies |
-| `groups` | Groups to which access is granted (empty = global) |
-| `domain_force` | Domain predicate (Python expression) |
-| `perm_read`, `perm_write`, `perm_create`, `perm_unlink` | Operations the rule applies to (all by default) |
+| Attribute                                               | Description                                        |
+| ------------------------------------------------------- | -------------------------------------------------- |
+| `name`                                                  | Description of the rule                            |
+| `model_id`                                              | Model to which the rule applies                    |
+| `groups`                                                | Groups to which access is granted (empty = global) |
+| `domain_force`                                          | Domain predicate (Python expression)               |
+| `perm_read`, `perm_write`, `perm_create`, `perm_unlink` | Operations the rule applies to (all by default)    |
 
 ### Domain Force Variables
 
-| Variable | Description |
-|----------|-------------|
-| `time` | Python's `time` module |
-| `user` | Current user (singleton recordset) |
-| `company_id` | Current user's selected company (single id) |
+| Variable      | Description                                     |
+| ------------- | ----------------------------------------------- |
+| `time`        | Python's `time` module                          |
+| `user`        | Current user (singleton recordset)              |
+| `company_id`  | Current user's selected company (single id)     |
 | `company_ids` | All companies the user has access (list of ids) |
 
 ### Example: Multi-Company Rule
@@ -147,11 +165,11 @@ Record rules are **default-allow**: if access rights grant access and no rule ap
 
 There's a large difference between global and group rules:
 
-| Rule Type | Behavior |
-|-----------|----------|
+| Rule Type              | Behavior                                           |
+| ---------------------- | -------------------------------------------------- |
 | **Global** (no groups) | **Intersect** - all global rules must be satisfied |
-| **Group** rules | **Unify** - any group rule can be satisfied |
-| **Global + Group** | **Intersect** - first group rule restricts access |
+| **Group** rules        | **Unify** - any group rule can be satisfied        |
+| **Global + Group**     | **Intersect** - first group rule restricts access  |
 
 > **Danger**: Creating multiple global rules is risky - possible to create non-overlapping rulesets which will remove all access.
 
@@ -162,6 +180,7 @@ There's a large difference between global and group rules:
 An ORM field can have a `groups` attribute providing a list of groups (comma-separated external identifiers).
 
 If the current user is not in one of the listed groups:
+
 - Restricted fields are removed from views
 - Restricted fields are removed from `fields_get()` responses
 - Attempts to read/write restricted fields result in an access error
@@ -180,13 +199,16 @@ notes = fields.Text('Internal Notes', groups='base.group_system')
 
 Any public method can be executed via RPC call. Methods starting with `_` are not callable from action buttons or external API.
 
+> **Odoo 19**: Use `@api.private` decorator to explicitly prevent RPC access on any method.
+
 ```python
 # BAD: this method is public and arguments can not be trusted
 def action_done(self):
     if self.state == "draft" and self.env.user.has_group('base.manager'):
         self._set_state("done")
 
-# GOOD: this method is private and can only be called from other methods
+# GOOD: use @api.private (Odoo 19) or underscore prefix
+@api.private
 def _set_state(self, new_state):
     self.sudo().write({"state": new_state})
 ```
@@ -293,8 +315,8 @@ Avoid using `t-raw` for rich-text content - it's an XSS vector.
 
 ```xml
 <div t-name="secure_template">
-    <div class="info"><t t-esc="message" /></div>
-    <div class="subject"><t t-esc="subject" /></div>
+    <div class="info"><t t-out="message" /></div>
+    <div class="subject"><t t-out="subject" /></div>
 </div>
 ```
 

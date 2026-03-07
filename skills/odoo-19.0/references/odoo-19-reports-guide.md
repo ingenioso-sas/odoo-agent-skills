@@ -3,6 +3,7 @@
 Guide for creating QWeb reports in Odoo 19: PDF/HTML reports, templates, and paper formats.
 
 ## Table of Contents
+
 - [Report Basics](#report-basics)
 - [Report Declaration](#report-declaration)
 - [Report Templates](#report-templates)
@@ -18,6 +19,7 @@ Guide for creating QWeb reports in Odoo 19: PDF/HTML reports, templates, and pap
 Reports are written in HTML/QWeb. PDF rendering is performed by wkhtmltopdf.
 
 Reports consist of:
+
 1. A **report action** (`ir.actions.report`)
 2. A **QWeb template** for the report content
 
@@ -55,21 +57,21 @@ Reports consist of:
 
 ### Report Attributes
 
-| Attribute | Description |
-|-----------|-------------|
-| `id` | External identifier |
-| `string` | Report name |
-| `model` | Model for the report |
-| `report_type` | `qweb-pdf` or `qweb-html` |
-| `name` | External ID of QWeb template |
-| `file` | Same as name (for backward compatibility) |
-| `print_report_name` | Python expression for filename |
-| `paperformat_id` | Paper format |
-| `binding_model_id` | Model to show in Print menu |
-| `groups_id` | Groups allowed to use report |
-| `multi` | If True, don't show on form view |
-| `attachment_use` | Generate once, reprint from stored |
-| `attachment` | Python expression for attachment |
+| Attribute           | Description                               |
+| ------------------- | ----------------------------------------- |
+| `id`                | External identifier                       |
+| `string`            | Report name                               |
+| `model`             | Model for the report                      |
+| `report_type`       | `qweb-pdf` or `qweb-html`                 |
+| `name`              | External ID of QWeb template              |
+| `file`              | Same as name (for backward compatibility) |
+| `print_report_name` | Python expression for filename            |
+| `paperformat_id`    | Paper format                              |
+| `binding_model_id`  | Model to show in Print menu               |
+| `groups_id`         | Groups allowed to use report              |
+| `multi`             | If True, don't show on form view          |
+| `attachment_use`    | Generate once, reprint from stored        |
+| `attachment`        | Python expression for attachment          |
 
 ---
 
@@ -79,16 +81,16 @@ Reports consist of:
 
 Report templates always have access to:
 
-| Variable | Description |
-|----------|-------------|
-| `docs` | Records for the current report |
-| `doc_ids` | List of ids for `docs` |
-| `doc_model` | Model name for `docs` |
-| `time` | Python `time` module |
-| `user` | User printing the report |
-| `res_company` | Current user's company |
-| `website` | Current website (if any) |
-| `web_base_url` | Base URL for webserver |
+| Variable            | Description                                   |
+| ------------------- | --------------------------------------------- |
+| `docs`              | Records for the current report                |
+| `doc_ids`           | List of ids for `docs`                        |
+| `doc_model`         | Model name for `docs`                         |
+| `time`              | Python `time` module                          |
+| `user`              | User printing the report                      |
+| `res_company`       | Current user's company                        |
+| `website`           | Current website (if any)                      |
+| `web_base_url`      | Base URL for webserver                        |
 | `context_timestamp` | Function to convert datetime to user timezone |
 
 ### Minimal Template
@@ -123,12 +125,12 @@ Calling `web.external_layout` adds default header and footer.
 
 #### Layout Variants
 
-| Layout | Description |
-|--------|-------------|
-| `web.external_layout` | Standard layout (with header/footer) |
-| `web.external_layout_background` | With background |
-| `web.external_layout_clean` | Clean layout (minimal) |
-| `web.external_layout_boxed` | Boxed layout |
+| Layout                           | Description                          |
+| -------------------------------- | ------------------------------------ |
+| `web.external_layout`            | Standard layout (with header/footer) |
+| `web.external_layout_background` | With background                      |
+| `web.external_layout_clean`      | Clean layout (minimal)               |
+| `web.external_layout_boxed`      | Boxed layout                         |
 
 ---
 
@@ -168,7 +170,7 @@ Use custom values in template:
             <t t-call="web.external_layout">
                 <div class="page">
                     <h2>My Report</h2>
-                    <p>Total: <span t-esc="my_custom_value"/></p>
+                    <p>Total: <span t-out="my_custom_value"/></p>
                 </div>
             </t>
         </t>
@@ -182,11 +184,11 @@ Use custom values in template:
 
 ### Built-in Paper Formats
 
-| Format | Size |
-|--------|------|
-| `paperformat_euro` | A4 |
-| `paperformat_us` | Letter |
-| `paperformat_us_legal` | Legal |
+| Format                 | Size   |
+| ---------------------- | ------ |
+| `paperformat_euro`     | A4     |
+| `paperformat_us`       | Letter |
+| `paperformat_us_legal` | Legal  |
 
 ### Custom Paper Format
 
@@ -210,19 +212,19 @@ Use custom values in template:
 
 ### Format Attributes
 
-| Attribute | Description |
-|-----------|-------------|
-| `format` | Paper size (A4, Letter, etc.) or Custom |
-| `page_height` | Page height in mm |
-| `page_width` | Page width in mm |
-| `orientation` | Portrait or Landscape |
-| `margin_top` | Top margin in mm |
-| `margin_bottom` | Bottom margin in mm |
-| `margin_left` | Left margin in mm |
-| `margin_right` | Right margin in mm |
-| `header_line` | Show header line |
-| `header_spacing` | Header spacing in mm |
-| `dpi` | Resolution (default: 90) |
+| Attribute        | Description                             |
+| ---------------- | --------------------------------------- |
+| `format`         | Paper size (A4, Letter, etc.) or Custom |
+| `page_height`    | Page height in mm                       |
+| `page_width`     | Page width in mm                        |
+| `orientation`    | Portrait or Landscape                   |
+| `margin_top`     | Top margin in mm                        |
+| `margin_bottom`  | Bottom margin in mm                     |
+| `margin_left`    | Left margin in mm                       |
+| `margin_right`   | Right margin in mm                      |
+| `header_line`    | Show header line                        |
+| `header_spacing` | Header spacing in mm                    |
+| `dpi`            | Resolution (default: 90)                |
 
 ---
 
@@ -288,13 +290,13 @@ Use `t-lang` to set language for a template section:
 
 ### Barcode Controller Parameters
 
-| Parameter | Values |
-|-----------|--------|
-| `type` | `QR`, `Code128`, `EAN13`, `EAN8`, `UPCA`, `UPCE` |
-| `value` | Barcode value |
-| `width` | Width in pixels |
-| `height` | Height in pixels |
-| `humanreadable` | `1` or `0` (show text below) |
+| Parameter       | Values                                           |
+| --------------- | ------------------------------------------------ |
+| `type`          | `QR`, `Code128`, `EAN13`, `EAN8`, `UPCA`, `UPCE` |
+| `value`         | Barcode value                                    |
+| `width`         | Width in pixels                                  |
+| `height`        | Height in pixels                                 |
+| `humanreadable` | `1` or `0` (show text below)                     |
 
 ### Example
 
@@ -313,19 +315,18 @@ Use `t-lang` to set language for a template section:
 
 ### Directives
 
-| Directive | Description |
-|-----------|-------------|
-| `t-esc` | Escape and output value |
-| `t-raw` | Output without escaping (XSS risk) |
-| `t-field` | Output field value (formatted) |
-| `t-if` | Conditional display |
-| `t-elif` | Else if condition |
-| `t-else` | Else condition |
-| `t-foreach` | Loop over collection |
-| `t-as` | Variable name for foreach |
-| `t-set` | Set variable |
-| `t-call` | Call another template |
-| `t-lang` | Set language for template |
+| Directive   | Description                                           |
+| ----------- | ----------------------------------------------------- |
+| `t-out`     | Escape and output value (replaces deprecated `t-esc`) |
+| `t-field`   | Output field value (formatted)                        |
+| `t-if`      | Conditional display                                   |
+| `t-elif`    | Else if condition                                     |
+| `t-else`    | Else condition                                        |
+| `t-foreach` | Loop over collection                                  |
+| `t-as`      | Variable name for foreach                             |
+| `t-set`     | Set variable                                          |
+| `t-call`    | Call another template                                 |
+| `t-lang`    | Set language for template                             |
 
 ### t-field Options
 

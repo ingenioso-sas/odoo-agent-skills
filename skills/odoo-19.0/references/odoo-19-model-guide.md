@@ -3,8 +3,11 @@
 Guide for working with Odoo 19 ORM, recordsets, CRUD operations, and domain filters.
 
 ## Table of Contents
+
 - [Models](#models)
 - [Fields](#fields)
+- [SQL Constraints](#sql-constraints)
+- [Database Indexes](#database-indexes)
 - [Recordsets](#recordsets)
 - [CRUD Operations](#crud-operations)
 - [Search Domains](#search-domains)
@@ -18,41 +21,54 @@ Guide for working with Odoo 19 ORM, recordsets, CRUD operations, and domain filt
 
 ### Defining a Model
 
+> **Odoo 19 Change**: `_name` is now **optional**. Odoo derives it automatically from the CamelCase class name (each capital letter → `.` separator). E.g. `ResPartner` → `res.partner`, `SaleOrder` → `sale.order`.
+
 ```python
 from odoo import models, fields
 
-class AModel(models.Model):
-    _name = 'a.model.name'
+# Odoo 19: _name auto-derived from class name
+class MyModel(models.Model):
+    # _name = 'my.model'  ← auto-derived, can be omitted
+    _description = 'My Model'
 
     field1 = fields.Char()
     field2 = fields.Integer(string="Field Label")
 ```
 
+```python
+# When _name differs from class name convention, specify explicitly:
+class CustomNameModel(models.Model):
+    _name = 'custom.different.name'
+    _description = 'Custom Named Model'
+
+    name = fields.Char()
+```
+
 ### Model Attributes
 
-| Attribute | Description |
-|-----------|-------------|
-| `_name` | Model name (required) |
-| `_description` | Model description |
-| `_order` | Default sort order |
-| `_rec_name` | Field to use as name representation |
-| `_inherit` | Model(s) to inherit from |
-| `_inherits` | Delegation inheritance |
-| `_table` | Database table name |
-| `_log_access` | Enable create_date, write_date, create_uid, write_uid |
-| `_auto` | Auto-create database table |
-| `_abstract` | Abstract model |
-| `_transient` | Transient model |
-| `_parent_store` | Enable parent_path field |
-| `_fold_name` | Field for kanban fold |
+| Attribute       | Description                                                                   |
+| --------------- | ----------------------------------------------------------------------------- |
+| `_name`         | Model name (**optional in Odoo 19** — auto-derived from CamelCase class name) |
+| `_description`  | Model description                                                             |
+| `_order`        | Default sort order                                                            |
+| `_rec_name`     | Field to use as name representation                                           |
+| `_inherit`      | Model(s) to inherit from                                                      |
+| `_inherits`     | Delegation inheritance                                                        |
+| `_table`        | Database table name                                                           |
+| `_log_access`   | Enable create_date, write_date, create_uid, write_uid                         |
+| `_auto`         | Auto-create database table                                                    |
+| `_abstract`     | Abstract model                                                                |
+| `_transient`    | Transient model                                                               |
+| `_parent_store` | Enable parent_path field                                                      |
+| `_fold_name`    | Field for kanban fold                                                         |
 
 ### Model Types
 
-| Class | Description |
-|-------|-------------|
-| `models.Model` | Regular database model |
-| `models.TransientModel` | Temporary/wizard model |
-| `models.AbstractModel` | Abstract model (no database table) |
+| Class                   | Description                        |
+| ----------------------- | ---------------------------------- |
+| `models.Model`          | Regular database model             |
+| `models.TransientModel` | Temporary/wizard model             |
+| `models.AbstractModel`  | Abstract model (no database table) |
 
 ---
 
@@ -90,29 +106,29 @@ name = fields.Char(default=lambda self: self._default_name())
 
 ### Field Types
 
-| Type | Class | Description |
-|------|-------|-------------|
-| **Basic** | | |
-| Boolean | `fields.Boolean()` | True/False |
-| Char | `fields.Char()` | String (limited length) |
-| Float | `fields.Float()` | Floating-point number |
-| Integer | `fields.Integer()` | Integer |
-| **Advanced** | | |
-| Binary | `fields.Binary()` | Binary data (files) |
-| Html | `fields.Html()` | HTML content |
-| Image | `fields.Image()` | Image (enhanced Binary) |
-| Monetary | `fields.Monetary()` | Monetary amount |
-| Selection | `fields.Selection()` | Selection from list |
-| Text | `fields.Text()` | Long text |
-| **Date** | | |
-| Date | `fields.Date()` | Date (no time) |
-| Datetime | `fields.Datetime()` | Date and time |
-| **Relational** | | |
-| Many2one | `fields.Many2one()` | Many-to-one |
-| One2many | `fields.One2many()` | One-to-many |
-| Many2many | `fields.Many2many()` | Many-to-many |
-| **Pseudo** | | |
-| Reference | `fields.Reference()` | Reference to any model |
+| Type              | Class                        | Description                 |
+| ----------------- | ---------------------------- | --------------------------- |
+| **Basic**         |                              |                             |
+| Boolean           | `fields.Boolean()`           | True/False                  |
+| Char              | `fields.Char()`              | String (limited length)     |
+| Float             | `fields.Float()`             | Floating-point number       |
+| Integer           | `fields.Integer()`           | Integer                     |
+| **Advanced**      |                              |                             |
+| Binary            | `fields.Binary()`            | Binary data (files)         |
+| Html              | `fields.Html()`              | HTML content                |
+| Image             | `fields.Image()`             | Image (enhanced Binary)     |
+| Monetary          | `fields.Monetary()`          | Monetary amount             |
+| Selection         | `fields.Selection()`         | Selection from list         |
+| Text              | `fields.Text()`              | Long text                   |
+| **Date**          |                              |                             |
+| Date              | `fields.Date()`              | Date (no time)              |
+| Datetime          | `fields.Datetime()`          | Date and time               |
+| **Relational**    |                              |                             |
+| Many2one          | `fields.Many2one()`          | Many-to-one                 |
+| One2many          | `fields.One2many()`          | One-to-many                 |
+| Many2many         | `fields.Many2many()`         | Many-to-many                |
+| **Pseudo**        |                              |                             |
+| Reference         | `fields.Reference()`         | Reference to any model      |
 | Many2oneReference | `fields.Many2oneReference()` | Many2one with dynamic model |
 
 ### Computed Fields
@@ -136,25 +152,141 @@ nickname = fields.Char(related='partner_id.name', store=True)
 
 ### Automatic Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | int | Identifier |
-| `display_name` | char | Display name |
-| `create_date` | datetime | Creation timestamp |
-| `create_uid` | Many2one | Creator |
-| `write_date` | datetime | Last update timestamp |
-| `write_uid` | Many2one | Last modifier |
+| Field          | Type     | Description           |
+| -------------- | -------- | --------------------- |
+| `id`           | int      | Identifier            |
+| `display_name` | char     | Display name          |
+| `create_date`  | datetime | Creation timestamp    |
+| `create_uid`   | Many2one | Creator               |
+| `write_date`   | datetime | Last update timestamp |
+| `write_uid`    | Many2one | Last modifier         |
 
 ### Reserved Field Names
 
-| Name | Type | Purpose |
-|------|------|---------|
-| `name` | Char | Default `rec_name` |
-| `active` | Boolean | Toggles global visibility |
-| `state` | Selection | Lifecycle stages |
-| `parent_id` | Many2one | Tree structure parent |
-| `parent_path` | Char | Tree structure path |
-| `company_id` | Many2one | Multi-company field |
+| Name          | Type      | Purpose                   |
+| ------------- | --------- | ------------------------- |
+| `name`        | Char      | Default `rec_name`        |
+| `active`      | Boolean   | Toggles global visibility |
+| `state`       | Selection | Lifecycle stages          |
+| `parent_id`   | Many2one  | Tree structure parent     |
+| `parent_path` | Char      | Tree structure path       |
+| `company_id`  | Many2one  | Multi-company field       |
+
+---
+
+## SQL Constraints
+
+> **Odoo 19 Breaking Change**: `_sql_constraints` is **no longer supported**. Use `models.Constraint` instead.
+
+### models.Constraint (Odoo 19)
+
+SQL constraints are now defined as model attributes using `models.Constraint`:
+
+```python
+from odoo import models, fields
+
+class MyModel(models.Model):
+    _name = 'my.model'
+    _description = 'My Model'
+
+    name = fields.Char(required=True)
+    code = fields.Char()
+    quantity = fields.Integer()
+
+    # UNIQUE constraint
+    _unique_name = models.Constraint(
+        'UNIQUE(name)',
+        'Name must be unique!',
+    )
+
+    # UNIQUE on multiple fields
+    _unique_name_code = models.Constraint(
+        'UNIQUE(name, code)',
+        'The combination of name and code must be unique!',
+    )
+
+    # CHECK constraint
+    _check_quantity = models.Constraint(
+        'CHECK(quantity > 0)',
+        'Quantity must be positive!',
+    )
+```
+
+### Constraint Naming
+
+If you omit the `_name` in the constraint, Odoo auto-generates a unique name based on model + attribute name.
+
+### Migration from `_sql_constraints`
+
+```python
+# ❌ OLD (Odoo 18 and earlier) — NO LONGER WORKS in Odoo 19
+class MyModel(models.Model):
+    _name = 'my.model'
+    _sql_constraints = [
+        ('name_uniq', 'UNIQUE(name)', 'Name must be unique!'),
+        ('check_qty', 'CHECK(quantity > 0)', 'Quantity must be positive!'),
+    ]
+
+# ✅ NEW (Odoo 19)
+class MyModel(models.Model):
+    _name = 'my.model'
+
+    _name_uniq = models.Constraint(
+        'UNIQUE(name)',
+        'Name must be unique!',
+    )
+
+    _check_qty = models.Constraint(
+        'CHECK(quantity > 0)',
+        'Quantity must be positive!',
+    )
+```
+
+### Overriding Constraints in Inherited Models
+
+Constraints can be overridden or removed in inherited models:
+
+```python
+class ExtendedModel(models.Model):
+    _inherit = 'my.model'
+
+    # Override constraint with different check
+    _check_qty = models.Constraint(
+        'CHECK(quantity >= 0)',
+        'Quantity cannot be negative!',
+    )
+```
+
+---
+
+## Database Indexes
+
+### Field-Level Index
+
+```python
+name = fields.Char(index=True)  # Simple btree index
+```
+
+### Declarative Index (Odoo 19)
+
+For composite or custom indexes, use `models.Index`:
+
+```python
+class MyModel(models.Model):
+    _name = 'my.model'
+
+    name = fields.Char()
+    code = fields.Char()
+    date = fields.Date()
+
+    # Composite index on multiple fields
+    _name_code_idx = models.Index('(name, code)')
+
+    # Index with specific method
+    _date_idx = models.Index('(date DESC)')
+```
+
+> **Warning**: Don't over-index — indexes consume space and impact INSERT/UPDATE/DELETE performance.
 
 ---
 
@@ -266,15 +398,15 @@ domain = [('name', '=', 'ABC'), ('phone', 'like', '7620')]
 
 ### Operators
 
-| Operator | Description |
-|----------|-------------|
-| `=` | equals |
-| `!=` | not equals |
-| `>`, `>=`, `<`, `<=` | comparison |
-| `=?` | unset or equals |
-| `=like`, `like`, `ilike`, `=ilike` | pattern matching |
-| `in`, `not in` | in list |
-| `child_of`, `parent_of` | tree traversal |
+| Operator                             | Description        |
+| ------------------------------------ | ------------------ |
+| `=`                                  | equals             |
+| `!=`                                 | not equals         |
+| `>`, `>=`, `<`, `<=`                 | comparison         |
+| `=?`                                 | unset or equals    |
+| `=like`, `like`, `ilike`, `=ilike`   | pattern matching   |
+| `in`, `not in`                       | in list            |
+| `child_of`, `parent_of`              | tree traversal     |
 | `any`, `any!`, `not any`, `not any!` | relation traversal |
 
 ### Logical Operators
@@ -344,6 +476,7 @@ records = self.env['model'].name_search('keyword', operator='ilike')
 ## Environment
 
 The environment holds:
+
 - Database cursor (`cr`)
 - Current user (`user`, `uid`)
 - Context (`context`)

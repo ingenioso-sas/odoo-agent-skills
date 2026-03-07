@@ -3,6 +3,7 @@
 Guide for optimizing Odoo 19 code: preventing N+1 queries, reducing database queries, and using profiler.
 
 ## Table of Contents
+
 - [Profiling](#profiling)
 - [Batch Operations](#batch-operations)
 - [Algorithmic Complexity](#algorithmic-complexity)
@@ -23,6 +24,7 @@ Odoo provides an integrated profiling tool to record SQL queries and stack trace
 4. Toggle **Enable profiling** again to start session profiling
 
 Options:
+
 - **Record sql** - Saves all SQL queries with stack trace
 - **Record traces** - Saves stack trace periodically (default: 10ms interval)
 
@@ -46,12 +48,12 @@ with self.profile():
 
 ### Collectors
 
-| Collector | Key | Description |
-|-----------|-----|-------------|
-| SQL collector | `sql` | Saves SQL queries with stack trace |
+| Collector          | Key            | Description                                      |
+| ------------------ | -------------- | ------------------------------------------------ |
+| SQL collector      | `sql`          | Saves SQL queries with stack trace               |
 | Periodic collector | `traces_async` | Saves stack trace periodically (separate thread) |
-| QWeb collector | `qweb` | Saves QWeb directive execution |
-| Sync collector | `traces_sync` | Saves every function call/return (high overhead) |
+| QWeb collector     | `qweb`         | Saves QWeb directive execution                   |
+| Sync collector     | `traces_sync`  | Saves every function call/return (high overhead) |
 
 ### Execution Context
 
@@ -87,6 +89,8 @@ def _compute_count(self):
 ```
 
 **GOOD**: Use `_read_group` (1 query)
+
+> **Odoo 19**: `read_group()` is **deprecated**. Use `_read_group()` (internal) or `formatted_read_group()` (public API).
 
 ```python
 def _compute_count(self):
@@ -205,12 +209,23 @@ name = fields.Char(string="Name", index=True)
 ### Using Indexes
 
 ```python
-# Without index: full table scan
-records = self.search([('name', '=', 'value')])
-
-# With index: index scan
+# Field-level index
 name = fields.Char(index=True)
-records = self.search([('name', '=', 'value')])
+records = self.search([('name', '=', 'value')])  # Uses index scan
+```
+
+### Declarative Index (Odoo 19)
+
+For composite indexes, use `models.Index` as a model attribute:
+
+```python
+class MyModel(models.Model):
+    _name = 'my.model'
+
+    name = fields.Char()
+    code = fields.Char()
+
+    _name_code_idx = models.Index('(name, code)')
 ```
 
 ---
@@ -220,6 +235,7 @@ records = self.search([('name', '=', 'value')])
 ### N+1 Query Problem
 
 Occurs when you:
+
 1. Fetch a list of records
 2. Loop through them
 3. Execute a query for each record
@@ -227,6 +243,7 @@ Occurs when you:
 **Detection**: Use `--log-sql` CLI parameter or profiler
 
 **Solution**: Fetch related data in one query using:
+
 - `_read_group()`
 - `search_fetch()`
 - `fetch()`
@@ -322,16 +339,16 @@ with self.profile():
 
 ## Good Practices Summary
 
-| Practice | Description |
-|----------|-------------|
-| **Batch operations** | Accumulate operations, execute in batch |
-| **Use _read_group** | Replace search/search_count in loops |
-| **Prefetch records** | Browse all records together |
-| **Reduce complexity** | Use dictionaries/sets instead of nested loops |
-| **Add indexes** | On frequently searched fields |
-| **Use fetch/search_fetch** | For targeted data loading |
-| **Profile first** | Use profiler before optimizing |
-| **Test query counts** | Use assertQueryCount in tests |
+| Practice                   | Description                                   |
+| -------------------------- | --------------------------------------------- |
+| **Batch operations**       | Accumulate operations, execute in batch       |
+| **Use \_read_group**       | Replace search/search_count in loops          |
+| **Prefetch records**       | Browse all records together                   |
+| **Reduce complexity**      | Use dictionaries/sets instead of nested loops |
+| **Add indexes**            | On frequently searched fields                 |
+| **Use fetch/search_fetch** | For targeted data loading                     |
+| **Profile first**          | Use profiler before optimizing                |
+| **Test query counts**      | Use assertQueryCount in tests                 |
 
 ---
 

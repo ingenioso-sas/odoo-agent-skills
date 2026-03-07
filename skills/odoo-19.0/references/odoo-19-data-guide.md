@@ -3,6 +3,7 @@
 Guide for working with Odoo 19 data files (XML and CSV), records, and shortcuts.
 
 ## Table of Contents
+
 - [XML Data Files Structure](#xml-data-files-structure)
 - [Record Tag](#record-tag)
 - [Field Tag](#field-tag)
@@ -49,14 +50,14 @@ If content should only be applied once:
 
 ### Attributes
 
-| Attribute | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `model` | string | Yes | Name of the model to create/update |
-| `id` | string | No* | External identifier for this record (strongly recommended) |
-| `context` | dict | No | Context to use when creating |
-| `forcecreate` | bool | No | In update mode, create if doesn't exist (default: True) |
+| Attribute     | Type   | Required | Description                                                |
+| ------------- | ------ | -------- | ---------------------------------------------------------- |
+| `model`       | string | Yes      | Name of the model to create/update                         |
+| `id`          | string | No\*     | External identifier for this record (strongly recommended) |
+| `context`     | dict   | No       | Context to use when creating                               |
+| `forcecreate` | bool   | No       | In update mode, create if doesn't exist (default: True)    |
 
-*Required for record updates; recommended for creation
+\*Required for record updates; recommended for creation
 
 ### Example
 
@@ -76,13 +77,13 @@ Each `record` can have `field` tags defining values.
 
 ### Attributes
 
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| `name` | string | **Required**. Name of the field to set |
-| `ref` | string | External ID to look up and set |
-| `search` | domain | Search domain, result set as field value |
-| `eval` | string | Python expression to evaluate |
-| `type` | string | Interpret field content (see types below) |
+| Attribute | Type   | Description                               |
+| --------- | ------ | ----------------------------------------- |
+| `name`    | string | **Required**. Name of the field to set    |
+| `ref`     | string | External ID to look up and set            |
+| `search`  | domain | Search domain, result set as field value  |
+| `eval`    | string | Python expression to evaluate             |
+| `type`    | string | Interpret field content (see types below) |
 
 ### Value Methods
 
@@ -115,18 +116,18 @@ Look up an external ID:
 
 Available types:
 
-| Type | Description |
-|------|-------------|
-| `xml`, `html` | Extract children as document, evaluate external IDs |
-| `file` | Ensure content is valid file path, saves `module,path` |
-| `char` | Set content directly without alterations |
-| `base64` | Base64-encode content (use with `file` attribute) |
-| `int`, `float` | Convert to number |
-| `list`, `tuple` | Contains `value` elements |
+| Type            | Description                                            |
+| --------------- | ------------------------------------------------------ |
+| `xml`, `html`   | Extract children as document, evaluate external IDs    |
+| `file`          | Ensure content is valid file path, saves `module,path` |
+| `char`          | Set content directly without alterations               |
+| `base64`        | Base64-encode content (use with `file` attribute)      |
+| `int`, `float`  | Convert to number                                      |
+| `list`, `tuple` | Contains `value` elements                              |
 
 ```xml
 <field name="description" type="xml">
-    <p>Hello <t t-esc="user.name"/></p>
+    <p>Hello <t t-out="user.name"/></p>
 </field>
 
 <field name="image" type="base64" file="static/img/logo.png"/>
@@ -143,6 +144,7 @@ Evaluate a Python expression:
 ```
 
 Evaluation context:
+
 - `time`, `datetime`, `timedelta`, `relativedelta` modules
 - `ref()` function to resolve external IDs
 - `obj` for current field's model
@@ -155,13 +157,13 @@ Evaluation context:
 
 ### Attributes
 
-| Attribute | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `model` | string | Yes | Model in which to delete |
-| `id` | string | No* | External ID of record to remove |
-| `search` | domain | No* | Domain to find records to remove |
+| Attribute | Type   | Required | Description                      |
+| --------- | ------ | -------- | -------------------------------- |
+| `model`   | string | Yes      | Model in which to delete         |
+| `id`      | string | No\*     | External ID of record to remove  |
+| `search`  | domain | No\*     | Domain to find records to remove |
 
-*Exclusive: use either `id` or `search`
+\*Exclusive: use either `id` or `search`
 
 ### Examples
 
@@ -181,10 +183,10 @@ Evaluation context:
 
 ### Attributes
 
-| Attribute | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `model` | string | Yes | Model to call method on |
-| `name` | string | Yes | Name of method to call |
+| Attribute | Type   | Required | Description             |
+| --------- | ------ | -------- | ----------------------- |
+| `model`   | string | Yes      | Model to call method on |
+| `name`    | string | Yes      | Name of method to call  |
 
 ### Parameters
 
@@ -213,13 +215,13 @@ Because some structural models are complex, data files provide shorter alternati
 
 Defines an `ir.ui.menu` record with defaults:
 
-| Attribute | Description |
-|-----------|-------------|
-| `parent` | External ID of parent menu, or interpret `name` as `/`-separated sequence |
-| `name` | Menu name (or get from linked action) |
-| `groups` | Comma-separated external IDs for `res.groups` (prefix `-` removes group) |
-| `action` | External ID of action to execute |
-| `id` | External identifier |
+| Attribute | Description                                                               |
+| --------- | ------------------------------------------------------------------------- |
+| `parent`  | External ID of parent menu, or interpret `name` as `/`-separated sequence |
+| `name`    | Menu name (or get from linked action)                                     |
+| `groups`  | Comma-separated external IDs for `res.groups` (prefix `-` removes group)  |
+| `action`  | External ID of action to execute                                          |
+| `id`      | External identifier                                                       |
 
 ```xml
 <menuitem id="my_module_menu_root" name="My Module" web_icon="my_module,static/description/icon.png"/>
@@ -230,15 +232,15 @@ Defines an `ir.ui.menu` record with defaults:
 
 Creates a QWeb view requiring only the `arch` section:
 
-| Attribute | Description |
-|-----------|-------------|
-| `id` | External identifier |
-| `name` | View name |
-| `inherit_id` | External ID of parent view |
-| `priority` | View priority |
-| `primary` | If True with `inherit_id`, defines as primary |
-| `groups` | Comma-separated group external IDs |
-| `active` | Whether view is active (for inheritance views) |
+| Attribute    | Description                                    |
+| ------------ | ---------------------------------------------- |
+| `id`         | External identifier                            |
+| `name`       | View name                                      |
+| `inherit_id` | External ID of parent view                     |
+| `priority`   | View priority                                  |
+| `primary`    | If True with `inherit_id`, defines as primary  |
+| `groups`     | Comma-separated group external IDs             |
+| `active`     | Whether view is active (for inheritance views) |
 
 ```xml
 <template id="my_template" name="My Template">
