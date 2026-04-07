@@ -1,26 +1,13 @@
 ---
 name: odoo-18
-description: >-
-  Odoo 18 development knowledge base with 18 specialized guides covering
-  Actions (ir.actions.*, cron jobs, server actions), Controllers (HTTP
-  routing, endpoints, auth types), Data files (XML/CSV records, shortcuts,
-  noupdate), API Decorators (@api.depends, @api.constrains, @api.ondelete,
-  @api.onchange, @api.model), Module development (manifest, wizards,
-  reports), Field types (Char, Text, Monetary, relational fields),
-  Manifest configuration (__manifest__.py, dependencies, asset bundles),
-  Mixins (mail.thread, mail.activity.mixin, mail.alias.mixin, utm.mixin),
-  ORM Model methods (search, CRUD, domain filters, recordsets, prefetch),
-  Migration scripts (pre/post/end hooks, data migration), OWL frontend
-  components (hooks, services, lifecycle), Performance optimization (N+1
-  prevention, batch ops, read_group), QWeb Reports (PDF/HTML, paper formats,
-  barcodes), Security/ACL (record rules, field permissions, multi-company),
-  Testing (TransactionCase, HttpCase, mocking, query count assertions),
-  Transactions (savepoints, UniqueViolation, serialization failures),
-  Translations (i18n, PO files, translatable fields), XML Views
-  (list/form/search, xpath inheritance, QWeb templates). Use when writing,
-  reviewing, or debugging any Odoo 18 Python or XML code, creating or
-  modifying modules, fixing performance issues, or looking up Odoo 18 API
-  patterns and best practices.
+description: >
+  Odoo 18 development reference for Python models and ORM (search, domain, read_group, compute fields),
+  XML/CSV data and views, OWL/JS client code, QWeb reports, security (ACL, record rules, groups),
+  cron and server actions, migrations and module upgrades, tests, i18n, and performance.
+  Use this skill whenever work involves Odoo 18 or custom addons—even if the user only pastes a traceback,
+  mentions addons/ or __manifest__.py, describes form/list/kanban/XML errors, HTTP controllers, or
+  business rules on models—including building features, fixing bugs, refactoring, or reviewing addon code.
+globs: "**/*.{py,xml,csv,js,ts}"
 ---
 
 # Odoo 18 Skill - Master Index

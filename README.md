@@ -30,16 +30,6 @@ npx skills add unclecatvn/agent-skills
 
 That's it! Your AI assistant will now have access to all the skills in this repository.
 
-### Alternative: Manual Installation
-
-```bash
-# Install the CLI globally
-npm install -g @unclecat/agent-skills-cli
-
-# Initialize a specific skill (e.g., Odoo 19 for Cursor)
-agent-skills init --ai cursor odoo --version 19.0
-```
-
 ---
 
 ## What's Inside?

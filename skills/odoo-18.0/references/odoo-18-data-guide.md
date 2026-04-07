@@ -34,6 +34,7 @@ Complete reference for Odoo 18 data files: XML structure, records, fields, short
 6. [Shortcuts](#shortcuts)
 7. [CSV Data Files](#csv-data-files)
 8. [noupdate Attribute](#noupdate-attribute)
+9. [Data Processing Patterns (Partner Merge)](#data-processing-patterns-partner-merge)
 
 ---
 
@@ -647,6 +648,71 @@ Data in `<data noupdate="1">` is only loaded at installation:
     </record>
 </data>
 ```
+
+---
+
+## Data Processing Patterns (Partner Merge)
+
+Patterns below are extracted from `odoo/addons/base/wizard/base_partner_merge.py` and are useful when building safe data-migration or merge logic in custom modules.
+
+### 1) Normalize Before Grouping
+
+When finding duplicates, normalize values first so grouping is stable:
+
+- `lower(name)` / `lower(email)` for case-insensitive comparisons
+- `replace(vat, ' ', '')` to ignore formatting spaces
+
+This avoids false negatives when data is logically equal but formatted differently.
+
+### 2) SQL for Candidate Detection, ORM for Access-Safe Filtering
+
+`base_partner_merge` uses SQL (`min(id), array_agg(id)`) to detect duplicate groups quickly, then re-reads partners with ORM:
+
+```python
+self._cr.execute(query)
+for min_id, aggr_ids in self._cr.fetchall():
+    partners = self.env['res.partner'].search([('id', 'in', aggr_ids)])
+```
+
+This pattern combines performance (SQL) with Odoo security/record-rule behavior (ORM).
+
+### 3) Generic FK Rewrite with Savepoint Fallback
+
+For merge operations across many tables:
+
+1. Discover FK relations dynamically
+2. Try bulk `UPDATE ... SET fk = dst_id WHERE fk IN src_ids`
+3. On unique constraint collision, fallback to deleting conflicting rows
+4. Keep each table operation isolated in a savepoint
+
+This prevents one collision from rolling back the whole merge process.
+
+### 4) Reference Field Rewrite (`model,res_id`)
+
+For `reference` fields and models like `ir.attachment`, `mail.followers`, `mail.activity`, `mail.message`, update links from source records to destination records in batch. Always use guarded writes and savepoints.
+
+### 5) Company-Dependent JSONB Data Migration
+
+For company-dependent many2one values stored as JSONB:
+
+- Update per-company values in SQL (`jsonb_each`, `jsonb_object_agg`)
+- Merge source JSONB values into destination in deterministic order
+- Flush environment after SQL updates
+
+This is safer than partial ORM-only writes when data is stored in JSONB structures.
+
+### 6) Deterministic Destination Selection
+
+The wizard selects destination partner by ordered criteria (`active`, `create_date`) before merge. In custom dedup flows, define and document an explicit winner strategy to keep behavior predictable.
+
+### 7) Defensive Checks Before Merge
+
+Before data merge, validate constraints to avoid corrupt states:
+
+- Do not merge parent with child (`child_of` checks)
+- Block conflicting user links
+- Enforce consistency checks (for example, same email unless admin)
+- Limit merge group size for operational safety
 
 ---
 
