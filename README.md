@@ -40,14 +40,16 @@ In-depth guides written specifically for AI consumption:
 
 | Skill | Description |
 |-------|-------------|
-| **[Odoo 18.0](skills/odoo-18.0/)** | Complete Odoo 18 development guide (ORM, OWL, Web Client, Performance) |
-| **[Odoo 19.0](skills/odoo-19.0/)** | Complete Odoo 19 development guide with latest features |
+| **[Odoo 18.0](skills/odoo-18.0/)** | Odoo 18 development (ORM, views, security, OWL, reports, migrations, performance) |
+| **[Odoo 19.0](skills/odoo-19.0/)** | Odoo 19 development guide with current conventions |
 | **[DTG Base](skills/dtg-base/)** | DTGBase utilities (date/period, timezone, batch, barcode, Vietnamese text) |
-| **[Payment Integration](skills/payment-integration/)** | Integration guides for SePay, Polar, Stripe, Paddle, Creem.io |
-| **[Code Review](skills/code-review/)** | Standards and protocols for automated code review |
-| **[Brainstorming](skills/brainstorming/)** | Structured framework for feature ideation |
-| **[Writing Skills](skills/writing-skills/)** | Guide for creating and editing AI skills |
-| **[MCP Builder](skills/mcp-builder/)** | Guide for building Model Context Protocol servers |
+| **[Payment Integration](skills/payment-integration/)** | SePay, Polar, Stripe, Paddle, Creem.io and related patterns |
+| **[Code Review](skills/code-review/)** | Standards and workflows for automated code review |
+| **[Brainstorming](skills/brainstorming/)** | Structured framework for feature ideation and spec review |
+| **[Writing Skills](skills/writing-skills/)** | Creating and editing AI skills (structure, evals, quality) |
+| **[MCP Builder](skills/mcp-builder/)** | Building Model Context Protocol servers |
+| **[Slide (AI Vibe Slides)](skills/slide/)** | Self-contained HTML/React slide decks for fullscreen presentation |
+| **[Visual Explainer](skills/visual-explainer/)** | Self-contained HTML for diagrams, diff/plan review, tables, and visual explanations |
 
 ### Agents - Autonomous Reviewers
 
@@ -55,11 +57,8 @@ Specialized agents that act as senior technical leads:
 
 | Agent | What it does |
 |-------|--------------|
-| **[Odoo Code Review](agents/odoo-code-review/SKILL.md)** | Automatically reviews Odoo code with scoring (1-10) and detailed feedback |
-| **[Odoo Code Tracer](agents/odoo-code-tracer/SKILL.md)** | Traces execution flow from entry point to end, identifying all function calls |
-| **[Odoo Module Generator](agents/odoo-module-generator/SKILL.md)** | Scaffolds complete Odoo 18 modules with proper structure |
-| **[Odoo Query Optimizer](agents/odoo-query-optimizer/SKILL.md)** | Diagnoses N+1 queries and provides optimization suggestions |
-| **[Odoo Migration Helper](agents/odoo-migration-helper/SKILL.md)** | Converts Odoo 16/17 code to Odoo 18 (tree→list, unlink→ondelete, etc.) |
+| **[Odoo Code Review](agents/odoo-code-review/SKILL.md)** | Reviews Odoo code with scoring (1–10) and structured feedback |
+| **[Odoo Code Tracer](agents/odoo-code-tracer/SKILL.md)** | Traces execution flow from an entry point through the call graph |
 | **[Planner](agents/planner.md)** | Breaks down complex features into actionable implementation steps |
 
 ### Rules - Coding Standards
@@ -78,17 +77,19 @@ Enforced patterns for consistent, secure code:
 ```
 agent-skills/
 ├── skills/
-│   ├── odoo-18.0/        # Odoo 18 development guide
-│   ├── odoo-19.0/        # Odoo 19 development guide
-│   ├── dtg-base/         # DTGBase utilities (date/period, timezone, batch)
-│   ├── payment-integration/  # Payment provider integrations
-│   ├── code-review/      # Code review standards
-│   ├── brainstorming/    # Feature ideation framework
-│   ├── writing-skills/   # Guide for creating skills
-│   └── mcp-builder/      # MCP server development guide
-├── agents/           # Autonomous code reviewers and planners
-├── rules/            # Coding standards and security patterns
-└── lib/              # Shared resources and images
+│   ├── odoo-18.0/             # Odoo 18 guides
+│   ├── odoo-19.0/             # Odoo 19 guides
+│   ├── dtg-base/              # DTGBase utilities
+│   ├── payment-integration/   # Payment integrations
+│   ├── code-review/           # Code review standards
+│   ├── brainstorming/         # Ideation and spec review
+│   ├── writing-skills/        # Authoring AI skills
+│   ├── mcp-builder/           # MCP servers
+│   ├── slide/                 # HTML/React slide decks
+│   └── visual-explainer/      # HTML diagrams and visual explanations
+├── agents/                   # Odoo reviewers + planner
+├── rules/                    # Coding style and security
+└── lib/                      # Shared assets (e.g. images)
 ```
 
 ---
@@ -97,7 +98,7 @@ agent-skills/
 
 Agent Skills works with popular AI-powered IDEs:
 
-- **Cursor** - Full integration via CLI
+- **Cursor** - Rules, remote rules, or `npx skills add`
 - **Claude Code** - Native skill support
 - **Windsurf** - Compatible
 - **Aider** - Compatible
@@ -129,8 +130,8 @@ graph LR
 | Metric | Value |
 |--------|-------|
 | Documentation | 10,000+ lines |
-| Skill Packs | 8 (Odoo 18.0, 19.0, DTG Base, Payment, Code Review, Brainstorming, Writing, MCP) |
-| Agents | 6 (Code Review, Tracer, Module Generator, Query Optimizer, Migration Helper, Planner) |
+| Skill packs | 10 (Odoo 18.0, 19.0, DTG Base, Payment, Code Review, Brainstorming, Writing Skills, MCP Builder, Slide, Visual Explainer) |
+| Agents | 3 (Odoo Code Review, Odoo Code Tracer, Planner) |
 | License | MIT |
 
 ---
@@ -144,7 +145,7 @@ We welcome contributions! Here's how you can help:
 - **Create agents** - Build specialized reviewers or planners
 - **Report issues** - Let us know what's missing or broken
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Open an issue or discussion on GitHub if you want to propose changes or new skills.
 
 ---
 
