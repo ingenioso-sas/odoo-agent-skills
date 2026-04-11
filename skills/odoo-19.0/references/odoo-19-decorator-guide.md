@@ -13,7 +13,7 @@ Guide for using `@api` decorators in Odoo 19: computed fields, validation, oncha
 - [@api.model_create_multi](#apimodel_create_multi)
 - [@api.autovacuum](#apiautovacuum)
 - [@api.private](#apiprivate)
-- [@api_returns](#apireturns)
+- [@api.returns](#apireturns)
 
 ---
 
@@ -367,6 +367,40 @@ def _do_stuff(self):  # Cannot be called from action buttons, but still conventi
 @api.private
 def compute_sensitive_data(self):  # Name doesn't need underscore
     pass
+```
+
+---
+
+---
+
+## @api.returns
+
+**Purpose**: Specify the return model of a method for API compatibility.
+
+```python
+from odoo import api, models
+
+class SaleOrder(models.Model):
+    _name = 'sale.order'
+
+    @api.returns('res.partner')
+    def get_partner(self):
+        """Returns partner record(s)"""
+        return self.mapped('partner_id')
+
+    @api.returns('self')
+    def copy(self, default=None):
+        """Returns new record(s) of same model"""
+        return super().copy(default)
+```
+
+**Common usage in Odoo base**:
+```python
+# Many methods use @api.returns
+@api.returns('mail.message', lambda value: value.id)
+def message_post(self, ...):
+    # Post a message, return the message
+    return message
 ```
 
 ---
