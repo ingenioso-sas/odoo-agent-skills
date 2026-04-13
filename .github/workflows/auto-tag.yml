@@ -6,6 +6,7 @@ on:
       - "main"
     paths:
       - "package.json"
+      - "CHANGELOG.md"
 
 permissions:
   contents: write
@@ -63,8 +64,51 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag -a "$TAG" -m "$TAG"
           git push origin "$TAG"
+          export TAG V
+          python - <<'PY'
+          import os
+          import re
+          import sys
+          from pathlib import Path
+
+          tag = os.environ["TAG"]
+          version = os.environ["V"]
+          changelog_path = Path("CHANGELOG.md")
+          if not changelog_path.exists():
+              print("ERROR: CHANGELOG.md not found at repository root.", file=sys.stderr)
+              sys.exit(1)
+
+          content = changelog_path.read_text(encoding="utf-8")
+          lines = content.splitlines()
+          start = None
+          for i, line in enumerate(lines):
+              if re.match(r"^##\s+\[(?:v)?%s\]\s*$" % re.escape(version), line) or re.match(
+                  r"^##\s+(?:v)?%s\s*$" % re.escape(version), line
+              ) or re.match(r"^##\s+\[(?:v)?%s\]\s*$" % re.escape(tag), line) or re.match(
+                  r"^##\s+(?:v)?%s\s*$" % re.escape(tag), line
+              ):
+                  start = i
+                  break
+
+          if start is None:
+              print(
+                  f"ERROR: Cannot find changelog section for {tag}. Add heading like '## [{version}]' in CHANGELOG.md.",
+                  file=sys.stderr,
+              )
+              sys.exit(1)
+
+          end = len(lines)
+          for i in range(start + 1, len(lines)):
+              if re.match(r"^##\s+", lines[i]):
+                  end = i
+                  break
+
+          section = "\n".join(lines[start:end]).strip() + "\n"
+          Path("release-notes.md").write_text(section, encoding="utf-8")
+          PY
+
           if gh release view "$TAG" >/dev/null 2>&1; then
-            echo "Release for $TAG already exists; skipping."
+            gh release edit "$TAG" --title "$TAG" --notes-file release-notes.md
           else
-            gh release create "$TAG" --title "$TAG" --generate-notes
+            gh release create "$TAG" --title "$TAG" --notes-file release-notes.md
           fi
