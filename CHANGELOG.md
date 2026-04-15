@@ -7,6 +7,25 @@ All notable changes to this project will be documented in this file.
 ### Added
 - TODO: Add upcoming changes here.
 
+## [1.0.8]
+
+### Release Description
+Documentation update focused on modernizing Odoo view examples and improving decorator guide accuracy after merging PR #5.
+
+### Changed
+- Replaced legacy `oe_chatter` examples with modern `chatter` usage in:
+  - `skills/odoo-18.0/references/odoo-18-view-guide.md`
+  - `skills/odoo-19.0/references/odoo-19-view-guide.md`
+- Corrected decorator reference from `@api_returns` to `@api.returns` in:
+  - `skills/odoo-19.0/references/odoo-19-decorator-guide.md`
+- Expanded `@api.returns` documentation with clearer usage patterns and examples in Odoo 19 guide.
+
+### Build
+- Bumped package version in `package.json` from `1.0.7` to `1.0.8`.
+
+### Contributors
+- [@BOKG](https://github.com/BOKG)
+
 ## [1.0.7]
 
 ### Release Description
