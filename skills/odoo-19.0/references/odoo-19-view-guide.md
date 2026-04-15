@@ -153,14 +153,11 @@ Guide for creating views in Odoo 19: list, form, search, kanban, calendar, graph
 
 ```xml
 <form string="My Model">
+    <chatter>
     <sheet>
         <!-- Form content -->
     </sheet>
-    <div class="oe_chatter">
-        <field name="message_follower_ids"/>
-        <field name="activity_ids"/>
-        <field name="message_ids"/>
-    </div>
+    </chatter>
 </form>
 ```
 

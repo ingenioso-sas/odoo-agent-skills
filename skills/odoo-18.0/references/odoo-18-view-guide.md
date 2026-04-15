@@ -151,6 +151,8 @@ Complete reference for Odoo 18 XML views, actions, menus, and QWeb templates.
 
 ```xml
 <form string="My Record" create="true" edit="true" delete="true">
+    <!-- Chatter (alternative position) -->
+    <chatter>
 
     <!-- Edit-only alerts -->
     <div class="alert alert-warning oe_edit_only" role="alert"
@@ -170,12 +172,6 @@ Complete reference for Odoo 18 XML views, actions, menus, and QWeb templates.
                     <span class="o_stat_text">Confirm</span>
                 </div>
             </button>
-        </div>
-
-        <!-- Chatter -->
-        <div class="oe_chatter">
-            <field name="message_ids"/>
-            <field name="activity_ids"/>
         </div>
 
         <!-- Main content -->
@@ -207,12 +203,8 @@ Complete reference for Odoo 18 XML views, actions, menus, and QWeb templates.
             </page>
         </notebook>
     </sheet>
-
     <!-- Chatter (alternative position) -->
-    <div class="oe_chatter">
-        <field name="message_ids"/>
-        <field name="activity_ids"/>
-    </div>
+        </chatter> 
 </form>
 ```
 
@@ -719,6 +711,7 @@ Complete reference for Odoo 18 XML views, actions, menus, and QWeb templates.
             <field name="arch" type="xml">
                 <form string="My Module" create="true">
                     <sheet>
+                    <chatter>
                         <div class="oe_button_box" name="button_box">
                             <button name="action_confirm" type="object"
                                     string="Confirm" class="oe_stat_button" icon="fa-check"/>
@@ -755,10 +748,7 @@ Complete reference for Odoo 18 XML views, actions, menus, and QWeb templates.
                             </page>
                         </notebook>
                     </sheet>
-                    <div class="oe_chatter">
-                        <field name="message_ids"/>
-                        <field name="activity_ids"/>
-                    </div>
+                    </chatter>
                 </form>
             </field>
         </record>
