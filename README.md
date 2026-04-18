@@ -40,6 +40,7 @@ In-depth guides written specifically for AI consumption:
 
 | Skill | Description |
 |-------|-------------|
+| **[Odoo 13.0](skills/odoo-13.0/)** | Odoo 13 development (ORM, views, classic JS, security, reports) |
 | **[Odoo 18.0](skills/odoo-18.0/)** | Odoo 18 development (ORM, views, security, OWL, reports, migrations, performance) |
 | **[Odoo 19.0](skills/odoo-19.0/)** | Odoo 19 development guide with current conventions |
 | **[DTG Base](skills/dtg-base/)** | DTGBase utilities (date/period, timezone, batch, barcode, Vietnamese text) |
@@ -73,13 +74,14 @@ Enforced patterns for consistent, secure code:
 ---
 
 ## Project Structure
-
 ```
 agent-skills/
 ├── skills/
+│   ├── odoo-13.0/             # Odoo 13 guides (classic JS)
 │   ├── odoo-18.0/             # Odoo 18 guides
 │   ├── odoo-19.0/             # Odoo 19 guides
 │   ├── dtg-base/              # DTGBase utilities
+...
 │   ├── payment-integration/   # Payment integrations
 │   ├── code-review/           # Code review standards
 │   ├── brainstorming/         # Ideation and spec review
@@ -89,7 +91,7 @@ agent-skills/
 │   └── visual-explainer/      # HTML diagrams and visual explanations
 ├── agents/                   # Odoo reviewers + planner
 ├── rules/                    # Coding style and security
-└── lib/                      # Shared assets (e.g. images)
+└── lib/                      # Shared assets (e.g. images)odoo-agent-skills
 ```
 
 ---
