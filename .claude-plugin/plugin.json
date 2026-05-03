@@ -16,6 +16,14 @@
       "agents/odoo-code-tracer/SKILL.md"
     ],
     "skills": [
+      "skills/dev/SKILL.md",
+      "skills/dev-start/SKILL.md",
+      "skills/dev-plan/SKILL.md",
+      "skills/dev-build/SKILL.md",
+      "skills/dev-fix/SKILL.md",
+      "skills/dev-refactor/SKILL.md",
+      "skills/dev-backlog/SKILL.md",
+      "skills/dev-finish/SKILL.md",
       "skills/odoo/18.0/SKILL.md",
       "skills/brainstorming/SKILL.md",
       "skills/mcp-builder/SKILL.md",
