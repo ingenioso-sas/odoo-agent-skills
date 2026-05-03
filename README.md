@@ -25,7 +25,7 @@ Get started in 30 seconds with NPX (recommended):
 
 ```bash
 # Add Agent Skills to your current project
-npx skills add unclecatvn/agent-skills
+npx skills add ingenioso-sas/ia-agent-skills
 ```
 
 That's it! Your AI assistant will now have access to all the skills in this repository.
@@ -40,6 +40,14 @@ In-depth guides written specifically for AI consumption:
 
 | Skill | Description |
 |-------|-------------|
+| **[Dev Flow (Orchestrator)](skills/dev/)** | Master command (`/dev`) to manage the entire development lifecycle |
+| **[Specification (dev.spec)](skills/dev-start/)** | Structured requirements gathering and technical design |
+| **[Planning (dev.plan)](skills/dev-plan/)** | Actionable task breakdown with L1-L4 layering system |
+| **[Build (dev.build)](skills/dev-build/)** | Quality-driven implementation with automated gates |
+| **[Bug Fix (dev.fix)](skills/dev-fix/)** | Scientific debugging with reproduction-first policy |
+| **[Refactor (dev.refactor)](skills/dev-refactor/)** | Safe code improvements with behavioral consistency checks |
+| **[Backlog (dev.backlog)](skills/dev-backlog/)** | Project task, bug, and technical debt management |
+| **[Finish (dev.finish)](skills/dev-finish/)** | Final validation, archival, and knowledge extraction |
 | **[Odoo 13.0](skills/odoo-13.0/)** | Odoo 13 development (ORM, views, classic JS, security, reports) |
 | **[Odoo 18.0](skills/odoo-18.0/)** | Odoo 18 development (ORM, views, security, OWL, reports, migrations, performance) |
 | **[Odoo 19.0](skills/odoo-19.0/)** | Odoo 19 development guide with current conventions |
@@ -77,13 +85,16 @@ Enforced patterns for consistent, secure code:
 ```
 agent-skills/
 ├── skills/
-│   ├── odoo-13.0/             # Odoo 13 guides (classic JS)
+│   ├── dev/                   # Master orchestrator (/dev)
+│   ├── dev-start/             # Specification (/dev.spec)
+│   ├── dev-plan/              # Planning (/dev.plan)
+│   ├── dev-build/             # Construction (/dev.build)
+│   ├── dev-fix/               # Bug fixing (/dev.fix)
+│   ├── dev-refactor/          # Refactoring (/dev.refactor)
+│   ├── dev-backlog/           # Backlog management (/dev.backlog)
+│   ├── dev-finish/            # Finalization (/dev.finish)
 │   ├── odoo-18.0/             # Odoo 18 guides
 │   ├── odoo-19.0/             # Odoo 19 guides
-│   ├── dtg-base/              # DTGBase utilities
-...
-│   ├── payment-integration/   # Payment integrations
-│   ├── code-review/           # Code review standards
 │   ├── brainstorming/         # Ideation and spec review
 │   ├── writing-skills/        # Authoring AI skills
 │   ├── mcp-builder/           # MCP servers
@@ -91,7 +102,7 @@ agent-skills/
 │   └── visual-explainer/      # HTML diagrams and visual explanations
 ├── agents/                   # Odoo reviewers + planner
 ├── rules/                    # Coding style and security
-└── lib/                      # Shared assets (e.g. images)odoo-agent-skills
+└── lib/                      # Shared assets (e.g. images)
 ```
 
 ---
@@ -131,8 +142,8 @@ graph LR
 
 | Metric | Value |
 |--------|-------|
-| Documentation | 10,000+ lines |
-| Skill packs | 10 (Odoo 18.0, 19.0, DTG Base, Payment, Code Review, Brainstorming, Writing Skills, MCP Builder, Slide, Visual Explainer) |
+| Documentation | 15,000+ lines |
+| Skill packs | 18 (Dev Flow, Spec, Plan, Build, Fix, Refactor, Backlog, Finish, Odoo, etc.) |
 | Agents | 3 (Odoo Code Review, Odoo Code Tracer, Planner) |
 | License | MIT |
 
