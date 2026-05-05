@@ -1,49 +1,92 @@
 ---
 name: dev.refactor
-description: Mejora de la estructura y legibilidad del código sin alterar su comportamiento funcional.
+description: Habilidad especializada en mitigar la deuda técnica y mejorar la calidad interna del código. Garantiza cero impacto en la funcionalidad de negocio mediante estrategias de línea base y verificación bidireccional.
 argument-hint: "[archivo-o-directorio]"
 ---
 
-# Skill: Refactorización Estructural (/dev.refactor)
+### REGLAS ESTRICTAS DE LECTURA E INTERACCIÓN
 
-Este skill está diseñado para combatir la deuda técnica. Permite mejorar la calidad interna del código asegurando que la funcionalidad externa permanezca idéntica a través de un proceso riguroso de verificación.
+> [!IMPORTANT]
+> Si en algún momento requieres que el usuario apruebe una estrategia de refactorización o escoja un patrón, debes utilizar la herramienta `AskUserQuestion(questions=[{...}])`.
+> NUNCA imprimas el JSON como texto, ni pidas por chat abierto que te escriban la respuesta.
 
-## Uso del Comando
+# Comando: `/dev.refactor`
 
-- `/dev.refactor [path]` → Inicia un análisis y propuesta de refactorización para un archivo o carpeta específica.
+**Misión**: Mejorar la mantenibilidad, legibilidad y estructura del código, garantizando mediante validaciones cruzadas que el comportamiento externo (los tests y contratos) permanece 100% inalterado.
 
----
-
-## Flujo de Trabajo de Alta Confianza
-
-### 1. Línea Base (Baseline)
-Antes de tocar el código, el agente **debe** verificar que el estado actual es estable.
-- **Acción**: Ejecutar las pruebas existentes relacionadas con el código a refactorizar.
-- **Regla**: Si las pruebas fallan inicialmente, el agente debe derivar a `/dev.fix` antes de intentar refactorizar.
-
-### 2. Análisis de Deuda
-Identificación de "olores de código" (code smells) y oportunidades de mejora:
-- **Puntos a evaluar**: Complejidad ciclomática, duplicación de código, nombres poco claros, acoplamiento excesivo.
-
-### 3. Implementación (Paso a Paso)
-Aplicar patrones de refactorización de forma incremental.
-- **Patrones Comunes**: Extraer método, renombrar variables, simplificar condicionales, reemplazar constantes mágicas.
-- **Regla**: Prohibido añadir lógica de negocio o cambiar el comportamiento esperado.
-
-### 4. Verificación de Consistencia
-Demostrar que el comportamiento funcional es idéntico.
-- **Acción**: Ejecutar nuevamente las pruebas de la línea base.
-- **Resultado**: Todas las pruebas deben pasar en "Verde" sin modificaciones en los casos de prueba.
-
-### 5. Validación de Calidad
-Confirmar que el cambio realmente aportó valor.
-- **Métricas**: ¿Mejoró la legibilidad? ¿Se redujo la complejidad? ¿Es más fácil de testear?
+**Uso**:
+- `/dev.refactor [path_a_archivo]` → Analiza y refactoriza un archivo específico.
+- `/dev.refactor [path_a_directorio]` → Escanea el directorio buscando code smells y propone refactorizaciones.
 
 ---
 
-## Reglas de Oro
+## Restricción de Dominio (Boundary Rules)
 
-- **Refactorización ≠ Funcionalidad Nueva**: Si necesitas cambiar qué hace el código, usa `/dev.build`. Si solo quieres cambiar cómo está escrito, usa `/dev.refactor`.
-- **Pequeños Pasos**: Es mejor realizar 10 refactorizaciones pequeñas y probadas que una grande y arriesgada.
-- **Cobertura de Tests**: No se recomienda refactorizar código que no tenga una suite de pruebas mínima que garantice su comportamiento.
-- **Legibilidad sobre Astucia**: El objetivo es que el código sea más fácil de entender para humanos, no necesariamente más "corto" o "ingenioso".
+1. **PROHIBIDO MODIFICAR FUNCIONALIDAD**: `/dev.refactor` tiene ESTRICTAMENTE PROHIBIDO alterar la lógica de negocio. Si detectas un bug durante la refactorización, NO lo arregles; deriva a `/dev.fix`.
+2. **ESPECIFICACIONES INMUTABLES**: No puedes bajo ningún concepto modificar los archivos `1-functional/spec.md`, `2-technical/spec.md`, ni `tasks.json`. El refactor es un proceso técnico subyacente.
+3. **MICRO-COMMITS**: La refactorización debe dividirse en los pasos más pequeños y atómicos posibles.
+
+---
+
+## Flujo de Trabajo (Refactoring Loop)
+
+### Fase 1: Línea Base de Estabilidad (Pre-Flight Check)
+
+> **Regla de Oro**: Jamás refactorices código roto.
+
+Antes de tocar una sola línea de código, el agente DEBE ejecutar los tests asociados al componente objetivo.
+```bash
+# Detectar el framework y ejecutar pruebas (usa bash tools del SDD Kit)
+test_status=$(bash ~/.dev-sdd-kit/tools/tests/run-target-test.sh [path] --json)
+```
+
+- Si los tests **Pasan** (Verde) → Proceder a Fase 2.
+- Si los tests **Fallan** (Rojo) → DETENER FLUJO. Imprime alerta: "El código actual no es estable. Llama a `/dev.fix` antes de intentar refactorizar."
+
+### Fase 2: Análisis Estático y Code Smells
+
+Delega el análisis estructural al subagente experto en arquitectura (o escáner de deuda).
+Evalúa:
+1. **Complejidad Ciclomática**: ¿Hay condicionales anidados excesivos (`if/else/switch`)?
+2. **Duplicación (DRY)**: ¿Existen bloques lógicos repetidos?
+3. **Acoplamiento**: ¿El módulo expone dependencias que deberían inyectarse o aislarse?
+4. **Legibilidad**: Nombramiento confuso (variables como `d`, `tmp1`, clases `Manager`).
+
+Presenta los hallazgos en formato de tabla (NO interactiva) como resumen visual:
+```markdown
+| Archivo | Olor Detectado | Solución Propuesta (Patrón) | Complejidad |
+|---------|----------------|-----------------------------|-------------|
+| utils.go| Condicionales anidados| Extract Method / Guard Clauses | Baja |
+```
+
+A continuación, utiliza `AskUserQuestion` para solicitar confirmación de proceder con el plan propuesto o ajustar el enfoque.
+
+### Fase 3: Ejecución Incremental (Micro-Refactoring)
+
+Aplica el patrón seleccionado modificando el código.
+Al hacerlo, aplica la estrategia de Micro-Pasos:
+1. Aplica un cambio (ej. Renombrar variable).
+2. Verifica si el proyecto compila.
+3. Aplica otro cambio (ej. Extraer método).
+
+*Nota de Seguridad*: Siempre asegúrate de que estás leyendo las librerías permitidas si estás en un proyecto con capa de infraestructura (ej. `dev-gary-discovery` si es un componente de gary).
+
+### Fase 4: Verificación Bidireccional de Consistencia
+
+Al terminar los cambios, debes demostrar matemáticamente que la funcionalidad es idéntica a la Línea Base.
+
+1. **Re-ejecución Local**: Corre los tests específicos del componente.
+   - *Si falla*: Revertir automáticamente la edición del paso actual y notificar al usuario.
+2. **Propagación Horizontal (Igual que `/dev.fix`)**:
+   Asegúrate de que los cambios de nombres de variables o métodos se hayan propagado a todos los lugares donde se consumen. Usa `grep_search` o la herramienta equivalente para encontrar referencias huérfanas en el proyecto antes de dar por terminado el refactor.
+
+### Fase 5: Consolidación (Commit Automático)
+
+Si todo está en "Verde" y la verificación cruzada es exitosa, prepara un mensaje explicativo y ofrece integrarlo:
+```markdown
+# ♻️ Refactorización Completada
+- Reducción de complejidad ciclomática de 8 a 3.
+- Extracción de método `calcularDescuento()`.
+- Tests verificados (100% pasando).
+```
+Sugiere un comando de commit o realízalo usando herramientas bash seguras del kit si estás autorizado por el perfil del usuario.

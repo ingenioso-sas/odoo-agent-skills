@@ -41,6 +41,7 @@ In-depth guides written specifically for AI consumption:
 | Skill | Description |
 |-------|-------------|
 | **[Dev Flow (Orchestrator)](skills/dev/)** | Master command (`/dev`) to manage the entire development lifecycle |
+| **[Reverse Engineering (dev.reveng)](skills/dev-reveng/)** | Static analysis of existing codebases to generate SDD specifications |
 | **[Specification (dev.spec)](skills/dev-start/)** | Structured requirements gathering and technical design |
 | **[Planning (dev.plan)](skills/dev-plan/)** | Actionable task breakdown with L1-L4 layering system |
 | **[Build (dev.build)](skills/dev-build/)** | Quality-driven implementation with automated gates |

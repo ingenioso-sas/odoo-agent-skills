@@ -1,98 +1,162 @@
 ---
 name: dev.plan
-description: Transforma especificaciones técnicas aprobadas en tareas de implementación ejecutables.
-argument-hint: "[--approve|--refine|--view|--resume]"
+description: Transforma especificaciones aprobadas en un listado de tareas ejecutables. Se utiliza una vez que los Functional y Technical Specs tienen el visto bueno y se requiere desglosar el trabajo en tareas con estimaciones y asignación por capas.
+model: opus
+argument-hint: "[--approve]"
 ---
 
-# Skill: Planificación de Tareas (/dev.plan)
+### REGLAS DE EJECUCIÓN (INSTRUCCIONES PARA EL AGENTE)
 
-Este skill permite descomponer una especificación técnica en un plan de trabajo estructurado y detallado. Organiza las tareas por capas lógicas, gestiona dependencias y establece criterios de aceptación claros para cada paso de la implementación.
+> [!IMPORTANT]
+> A lo largo de esta skill encontrarás bloques como este:
+> 
+> ⛔ INVOKE TOOL (do not print this, CALL the tool):
+> `AskUserQuestion(questions=[{...}])`
+> 
+> Esta es una llamada a una herramienta (TOOL CALL). NO uses `echo`, `cat` ni `printf`. LLAMA directamente a la herramienta.
 
-## Uso del Comando
+# Acción Principal: `/dev.plan`
 
-- `/dev.plan` → Genera automáticamente el plan de tareas basado en las especificaciones actuales.
-- `/dev.plan --refine` → Permite ajustar, añadir o dividir tareas del plan existente.
-- `/dev.plan --approve` → Aprueba formalmente el plan y selecciona la estrategia de ejecución.
-- `/dev.plan --view` → Muestra una vista estructurada o interactiva de las tareas.
-- `/dev.plan --resume` → Reanuda una sesión de planificación interrumpida.
+**Objetivo**: Generar, refinar y dar por aprobadas las tareas de implementación.
 
----
-
-## Requisitos Previos
-
-| Requisito | Acción en caso de fallo |
-|-----------|-------------------------|
-| Especificación Técnica Aprobada | Ejecutar `/dev.spec technical --approve` |
-| Conflictos de Spec Resueltos | Revisar y corregir en la fase de `/dev.spec` |
-
----
-
-## Flujo de Trabajo
-
-### 1. Lectura y Análisis
-El agente lee las especificaciones funcionales y técnicas aprobadas para identificar componentes, cambios en el modelo de datos, nuevos endpoints y requerimientos de infraestructura.
-
-### 2. Generación de Tareas
-Se crean tareas siguiendo principios de modularidad y claridad. Cada tarea debe tener:
-- **Título Conciso**: Acción clara a realizar.
-- **Descripción**: 2-3 frases sobre el objetivo técnico.
-- **Capa (Layer)**: Ubicación en el stack de ejecución.
-- **Criterios de Aceptación (AC)**: Condiciones específicas para considerar la tarea como "Hecha".
-- **Puertas de Calidad (GATEs)**: Validaciones automáticas (ej: tests que deben pasar).
-
-### 3. Organización por Capas (Layers)
-
-Para asegurar un desarrollo ordenado, las tareas se agrupan en las siguientes capas:
-
-| Capa | Nombre | Propósito | Ejemplo de Tareas |
-|------|--------|-----------|-------------------|
-| **L1** | **Cimientos** | Configuración base e infraestructura. | Setup de BD, Dockerfile, Config de servicios. |
-| **L2** | **Núcleo** | Lógica de negocio y persistencia. | Modelos, Repositorios, Servicios, APIs. |
-| **L3** | **Interfaz** | Capa visual o integración externa. | Componentes UI, Integración con terceros. |
-| **L4** | **Calidad** | Validaciones finales y pulido. | Pruebas E2E, Refactorización, Documentación. |
+**Opciones de Invocación**:
+- `/dev.plan` → Comportamiento automático según el perfil/modo.
+- `/dev.plan --refine` → Refina/modifica tareas preexistentes.
+- `/dev.plan --approve` → Confirma tareas y escoge la estrategia de ejecución.
+- `/dev.plan --resume` → Continúa una sesión de planeación en pausa.
+- `/dev.plan --view` → Abre el visor HTML interactivo de las tareas.
 
 ---
 
-## Estructura de Salida (`tasks.json`)
+## Verificaciones Previas (BLOQUEANTES)
 
-El plan se almacena en un archivo `tasks.json` que actúa como la única fuente de verdad para la fase de construcción (`/dev.build`).
+| Condición | Herramienta | Acción si Falla |
+|-----------|-------------|-----------------|
+| Conflictos resueltos | `validate-spec-conflicts.sh` | Deriva a `/dev.spec` |
+| Technical Spec aprobado | Leer `meta.md` | Deriva a `/dev.spec technical` |
+| Contexto < 50% | Skill `context-guardian` | Aviso / Recomendación de compactar |
 
+---
+
+## Skill Hooks (Extensibilidad)
+
+`/dev.plan` tiene 3 puntos de anclaje que se resuelven leyendo `skill-hooks.json`:
+- `before-start` (Antes de validar fase)
+- `after-implementation` (Tras la generación del listado de tareas)
+- `before-approval` (Antes de pedir aprobación)
+
+---
+
+## Flujo de Trabajo Secuencial
+
+### Paso 1: Detección de Fase y Chequeo de Contexto
+Se DEBE usar la herramienta en bash:
+```bash
+phase_result=$(bash ~/.dev-sdd-kit/tools/detection/detect-phase.sh dev/wip/[feature] --json)
+current_stage=$(echo "$phase_result" | grep -o '"stage":"[^"]*"' | cut -d'"' -f4)
+
+# Si current_stage no es "tasks" ni "implementation", abortar.
+```
+Luego invoca `context-guardian`. Si el contexto es mayor a 70%, sugiere compactar.
+
+### Paso 2: Validación Anti-Conflictos
+Ejecuta `validate-spec-conflicts.sh`. Si hay desviaciones entre specs, detén la ejecución e indica usar `/dev.spec`.
+
+### Paso 3: Lectura de Especificaciones (Inputs)
+Lee los archivos `1-functional/spec.md` y `2-technical/spec.md`.
+Verifica `meta.md`:
+- Si ambos están auto-generados (`auto_generated.functional == true` y `technical == true`), apóyate pesadamente en el backlog.
+- Si solo el funcional es auto-generado, usa el Technical Spec como principal fuente de verdad.
+
+### Paso 4: Detección de Entorno y Servicios
+*Se omite si la plataforma es iOS o Android.*
+Si detectas bases de datos relacionales en el spec (backend/web):
+- Si el perfil es "technical": Pregunta al usuario si desea crear un contenedor local, testcontainers o usar uno existente.
+- Si el perfil es "non-technical": Selecciona autómaticamente la opción de contenedor local sin preguntar.
+
+### Paso 5: Generación Estricta de Tareas
+
+Las tareas se escriben **exclusivamente en formato JSON** en `3-tasks/tasks.json`. (NO crear `tasks.md`).
+Para cada tarea, mapea las Decisiones de Diseño (`design_decisions: ["DD-1", ...]`) del Technical Spec para que el subagente de implementación no invente alternativas.
+
+**Validación Mobile vs Web/Backend**:
+- Si `platform = android | ios`: Las tareas NUNCA deben mencionar Dockerfile, /ping o gary compliance. Deben usar `./gradlew test` o `xcodebuild test`. Las librerías Everest listadas en la sección 3 del Technical Spec DEBEN usarse textualmente en las tareas.
+- Si `platform = backend | web | ""`: Tareas obligatorias incluyen crear Dockerfile(s), endpoint /ping y validación de cumplimiento de plataforma gary.
+
+**Regla Anti-Despliegue**: PROHIBIDO generar tareas de despliegue ("deploy", "gary deploy", "push to prod"). El agente solo codifica y testea.
+
+**Migraciones de DB**: Si hay cambios de esquema, SIEMPRE usar `gary migration init`. Prohibido usar Flyway, Liquibase o crear .sql manualmente.
+
+**Extracción de Escenarios E2E (Offloaded)**:
+Ejecuta `genai-analyze-e2e.sh` para detectar escenarios E2E y su grafo de dependencias.
+Si `total_scenarios > 0` y `ltp.enabled == true`, crea la tarea obligatoria `AUTO-TASK-E2E`.
+
+### Paso 6: Selección de Estrategia
+- Perfil `non-technical`: Auto-selecciona "Batched".
+- Perfil `technical`: Si hay ≤5 tareas y todas de baja complejidad, auto-selecciona "Sequential". Si es más grande, usa `AskUserQuestion` para ofrecer "Sequential", "Batched" (Recomendado) o "Parallel".
+
+### Paso 7: Aprobación y Presentación Visual
+
+**ANTES** de pedir confirmación, asegúrate de correr el script de previsualización:
+```bash
+bash ~/.dev-sdd-kit/tools/state/display-tasks.sh dev/wip/[feature]/3-tasks/tasks.json
+```
+Luego muestra la tabla de resumen y por último invoca `AskUserQuestion`:
+```json
+AskUserQuestion(
+  questions=[{
+    "question": "Approve these tasks?",
+    "header": "Tasks",
+    "options": [
+      {"label": "Yes, approve", "description": "Approve tasks and continue"},
+      {"label": "Adjust tasks", "description": "Modify task list before approving"},
+      {"label": "Cancel", "description": "Cancel task generation"}
+    ],
+    "multiSelect": false
+  }]
+)
+```
+
+### Paso 8 y 9: Context Advisory Post-Plan y Siguiente Paso
+Si el contexto superó 50% al finalizar, recomienda hacer `/clear` + `/dev.build`.
+Usa `AskUserQuestion` para que el usuario elija su siguiente acción (normalmente `/clear + /dev.build`).
+
+---
+
+## Formato del Archivo `tasks.json`
+
+Debe incluir la metadata, la configuración local, estadísticas, la lista de tareas y el grafo de dependencias:
 ```json
 {
-  "feature": "nombre-funcionalidad",
-  "stats": { "total": 10, "done": 0 },
+  "feature": "nombre",
+  "local_config": { "mysql": "container" },
+  "stats": { "total": 2 },
   "tasks": [
     {
       "id": "TASK-001",
-      "title": "Configuración de Base de Datos",
-      "description": "Crear migraciones y definir esquemas iniciales.",
+      "title": "Config",
+      "description": "Corto.",
       "status": "pending",
       "layer": 1,
       "depends_on": [],
-      "acceptance_criteria": [
-        "AC-1: Tablas creadas según el diseño técnico",
-        "GATE: La migración se aplica correctamente en el entorno local"
-      ]
+      "files": [],
+      "acceptance_criteria": ["GATE: test passes"],
+      "references": ["US-1"],
+      "design_decisions": ["DD-1"]
     }
   ]
 }
 ```
 
----
+> **Generación de IDs**: Usa obligatoriamente `generate-ids.sh` para obtener IDs secuenciales y únicos de la forma `TASK-NNN`.
 
-## Estrategias de Ejecución
+## Capas (Layers)
+- **Capa 1**: Código local, unit tests.
+- **Capa 2**: Dependencias gary, colas, bases de datos remotas.
+- **Capa 3**: Revisiones de Calidad. DEBE incluir exactamente: `dev-code-reviewer`, `dev-performance-expert`, y `dev-security-expert`. (Para el de seguridad, invocar ApplicationSecurityMCP).
 
-Al aprobar el plan (`--approve`), el usuario puede elegir cómo desea que el agente aborde las tareas:
+## Funcionalidad `--view`
+Llama a `view-tasks.sh` apuntando al `tasks.json` actual para abrir una interfaz en HTML interactiva.
 
-1. **Secuencial**: Tarea por tarea, ideal para flujos lineales y simples.
-2. **Por Lotes (Batched)**: Agrupa tareas relacionadas para optimizar el contexto y la velocidad. (Recomendado).
-3. **Paralelo**: Aborda múltiples tareas de manera simultánea si no tienen dependencias entre sí.
-
----
-
-## Reglas de Oro
-
-- **Sin Tareas de Despliegue**: El agente se enfoca en código, pruebas y configuraciones. El despliegue a producción es una fase externa.
-- **IDs Deterministas**: Las tareas deben seguir una numeración secuencial (TASK-001, TASK-002...).
-- **Estimación de Complejidad**: Cada tarea debe marcarse como Baja, Media o Alta para ayudar en la priorización.
-- **Interacción Proactiva**: Si una tarea parece demasiado grande, el agente debe sugerir dividirla durante la fase de `--refine`.
+## Refinamiento de Tareas (`--refine`)
+Permite dividir, borrar, o modificar la complejidad/prioridad de tareas vía diálogo interactivo con el usuario.

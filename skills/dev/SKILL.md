@@ -1,84 +1,123 @@
 ---
 name: dev
-description: Orquestador central del ciclo de vida de desarrollo de software. Gestiona el flujo desde la idea hasta el archivado.
+description: Orquestador maestro del ciclo de vida de desarrollo de software (SDD Kit). Centraliza la navegación, detecta el estado del proyecto y deriva inteligentemente a la siguiente fase del workflow.
+argument-hint: "[status|list|config]"
 ---
 
-# Orquestador de Desarrollo (/dev)
+### REGLAS ESTRICTAS DE LECTURA E INTERACCIÓN
 
-Este es el comando central para gestionar el ciclo de vida de tus funcionalidades. Detecta automáticamente en qué etapa te encuentras y te guía hacia el siguiente paso lógico, integrando todas las skills de desarrollo.
+> [!IMPORTANT]
+> Si en algún momento de la orquestación encuentras:
+> 
+> ⛔ INVOKE TOOL (do not print this, CALL the tool):
+> `AskUserQuestion(questions=[{...}])`
+> 
+> ESTO ES UNA LLAMADA A LA HERRAMIENTA. DEBES LLAMARLA. NUNCA imprimas opciones JSON con `echo` ni solicites ingreso de datos por texto libre si la interfaz de la herramienta está disponible.
 
-## Comandos Principales
+# Comando Base: `/dev`
 
-- `/dev` → **Piloto Automático**: Analiza el proyecto y sugiere o ejecuta la siguiente acción necesaria.
-- `/dev status` → **Panel de Control**: Muestra un resumen visual del estado de la funcionalidad actual.
-- `/dev list` → **Explorador**: Lista todas las funcionalidades activas (`wip/`) y terminadas (`features/`).
-- `/dev config` → **Ajustes**: Configura las reglas, lenguajes y estándares del proyecto.
+**Misión**: Actuar como el "Router Inteligente" del proyecto. Analiza el entorno actual, lee los metadatos y recomienda o lanza automáticamente la fase que corresponde. Evita que el usuario tenga que recordar la secuencia de comandos.
 
----
+## Modos de Operación
 
-## Flujo de Trabajo Inteligente
-
-Al ejecutar `/dev`, el agente realiza una detección de fase basada en el estado de los archivos:
-
-| Estado Detectado | Acción Sugerida | Skill Delegada |
-|------------------|-----------------|----------------|
-| Sin área de trabajo activa | Iniciar nueva funcionalidad | `/dev.spec` |
-| Especificación incompleta | Refinar requerimientos | `/dev.spec` |
-| Spec aprobada, sin tareas | Crear plan de ejecución | `/dev.plan` |
-| Tareas pendientes | Continuar implementación | `/dev.build` |
-| Error detectado o Bug reportado | Corregir fallo técnico | `/dev.fix` |
-| Deuda técnica identificada | Mejorar estructura de código | `/dev.refactor` |
-| Tareas completadas | Validar y archivar | `/dev.finish` |
+- `/dev` → (Piloto Automático) Ejecuta el heurístico de detección y sugiere qué hacer a continuación.
+- `/dev status` → Muestra un panel (dashboard) holístico con el progreso, las puertas de calidad (gates) y métricas de completitud.
+- `/dev list` → Lista de todo el inventario de features en `dev/wip/` y `dev/features/`.
+- `/dev config` → Gestor de configuración del entorno (lee/escribe `user-profile.yaml` y `.gary`).
 
 ---
 
-## Panel de Control (`/dev status`)
+## Flujo Heurístico de Detección (Piloto Automático)
 
-Muestra una visualización premium del progreso actual:
+Cuando se ejecuta `/dev` sin argumentos, el agente DEBE realizar esta evaluación secuencial:
+
+### 1. Detección de Directorio y Contexto
+```bash
+# Revisar si existe carpeta wip/
+wip_count=$(ls -1 dev/wip/ 2>/dev/null | wc -l | tr -d ' ')
+# Verificar si el repo tiene historial pero cero docs
+has_code=$(bash ~/.dev-sdd-kit/tools/detection/detect-stack.sh . --has-code-only)
+```
+
+### 2. Árbol de Decisión (Enrutamiento)
+
+Evalúa secuencialmente y detente en la primera condición que se cumpla:
+
+1. **Repo heredado sin documentación**:
+   - *Condición*: `has_code == true` y no existe `dev/wip/` ni `dev/features/`.
+   - *Acción*: Mostrar mensaje "Se detectó código existente sin especificaciones".
+   - *Derivación*: Llama a `AskUserQuestion` ofreciendo lanzar `/dev.reveng` para aplicar ingeniería inversa.
+
+2. **Inicio (Arranque de Cero)**:
+   - *Condición*: Directorio `dev/wip/` está vacío o no existe.
+   - *Acción*: Sugerir crear una funcionalidad nueva.
+   - *Derivación*: Lanza la sugerencia de iniciar con `/dev.start`.
+
+3. **Análisis del WIP Actual** (Si hay exactamente 1 feature activa en `wip/`):
+   - Lee el archivo `meta.md` de esa feature.
+   - Determina el `status` de cada fase:
+     - `stages.functional == draft` → Deriva a `/dev.spec functional`
+     - `stages.technical == draft` → Deriva a `/dev.spec technical`
+     - `stages.technical == approved` y no hay `tasks.json` → Advierte que el contexto es denso. Ejecuta compactación (`/dev.check --compact`) y luego deriva a `/dev.plan`.
+     - Hay `tasks.json` con tareas `pending` o `in_progress` → Muestra resumen rápido y deriva a `/dev.build`.
+     - Todo `tasks.json` está en "done" → Indica que el desarrollo culminó y deriva a `/dev.finish`.
+
+4. **Multi-WIP (Múltiples features activas)**:
+   - *Condición*: `dev/wip/` tiene > 1 feature.
+   - *Acción*: Presenta un `AskUserQuestion` listando los features activos para que el usuario escoja en cuál enfocar el radar, antes de evaluar la fase.
+
+---
+
+## Dashboard de Progreso (`/dev status`)
+
+Cuando se invoca `/dev status`, genera un panel consolidado, pero **DEBES usar subagentes y scripts** para recolectar la data. No inventes los porcentajes.
+
+```bash
+# Recolecta métricas reales
+stats=$(bash ~/.dev-sdd-kit/tools/metrics/get-status.sh dev/wip/$(ls dev/wip | head -1) --json)
+```
+
+Formato esperado de visualización:
 
 ```markdown
-# Estado del Proyecto: [Nombre de la Funcionalidad]
-> Etapa Actual: 🔄 **Construcción** (Capa 2: Núcleo)
+# 📡 Radar del Proyecto: [Nombre de la Feature]
 
-### 📊 Progreso General
-| Fase | Estado | Resultado |
-|------|--------|-----------|
-| **1. Especificación** | ✅ Completo | Aprobada |
-| **2. Planificación**  | ✅ Completo | 12 tareas generadas |
-| **3. Construcción**   | 🔄 En Curso | 5/12 completadas (42%) |
-| **4. Finalización**   | ⏳ Pendiente | - |
+> FASE ACTUAL: **[Detectada dinámicamente]**
 
-### 🛠️ Calidad y Puertas (Gates)
-- **Compilación**: ✅ Verde
-- **Tests Unitarios**: 🔄 85% Cobertura
-- **Linter**: ✅ Sin advertencias
-- **Seguridad**: ✅ Sin hallazgos
+### 📊 Avance del Ciclo (Stages)
+- [✅] Especificación Funcional (Aprobado por: @user)
+- [✅] Especificación Técnica (Aprobado por: @user)
+- [🔄] Planificación y Tareas (En Curso - 5/12 completadas)
+- [⏳] Finalización y QA (Pendiente)
+
+### 🛡️ Escáner de Calidad (Gates)
+| Métrica | Estado | Detalle |
+|---------|--------|---------|
+| Compilación | 🟢 PASA | Build exitoso en último commit |
+| Unit Tests | 🟡 ALERTA | Cobertura 68% (Mínimo: 80%) |
+| Linting | 🟢 PASA | 0 Errores críticos |
+```
+
+> **NOTA DE PERFIL**: Si el perfil en `user-profile.yaml` es `non-technical`, oculta la tabla de "Escáner de Calidad" y muestra simplemente: "Estado Técnico: Saludable / Requiere Atención".
+
+---
+
+## Protocolo de Pase de Batón (Handoff Protocol)
+
+El Orquestador base transfiere el control a otras skills mediante delegaciones de `Skill()`. 
+**Regla de Compactación de Contexto**:
+Antes de delegar de `/dev.spec` hacia `/dev.plan`, o de `/dev.plan` hacia `/dev.build`, el orquestador DEBE sugerir la liberación de contexto en memoria.
+Muestra este mensaje fijo:
+```
+🧹 CONTEXT HANDOFF:
+Estás cruzando una frontera de fase. Para maximizar la precisión del subagente destino, se recomienda ejecutar /clear en tu entorno y luego continuar con la siguiente skill propuesta.
 ```
 
 ---
 
-## Gestión de Estado
+## Delegaciones Directas de Soporte
 
-El orquestador utiliza el archivo `meta.md` en la carpeta `wip/` de cada funcionalidad para mantener la trazabilidad. No es necesario que el usuario edite este archivo; el orquestador lo mantiene actualizado automáticamente.
-
----
-
-## Beneficios del Orquestador
-
-1. **Simplicidad**: No necesitas recordar nombres de comandos complejos; `/dev` sabe qué hacer.
-2. **Consistencia**: Asegura que se sigan todos los pasos del ciclo de vida sin saltarse validaciones críticas.
-3. **Visibilidad**: Proporciona una fuente única de verdad sobre el avance del equipo y la calidad del código.
-4. **Agilidad**: Reduce la fricción entre fases (especificación -> planificación -> construcción).
-
----
-
-## Integraciones
-
-El orquestador delega el trabajo pesado a las skills especializadas:
-- [dev.spec](file:///Users/andersonbuitron/proyectos/ia-agent-skills/skills/dev-start/SKILL.md)
-- [dev.plan](file:///Users/andersonbuitron/proyectos/ia-agent-skills/skills/dev-plan/SKILL.md)
-- [dev.build](file:///Users/andersonbuitron/proyectos/ia-agent-skills/skills/dev-build/SKILL.md)
-- [dev.fix](file:///Users/andersonbuitron/proyectos/ia-agent-skills/skills/dev-fix/SKILL.md)
-- [dev.refactor](file:///Users/andersonbuitron/proyectos/ia-agent-skills/skills/dev-refactor/SKILL.md)
-- [dev.backlog](file:///Users/andersonbuitron/proyectos/ia-agent-skills/skills/dev-backlog/SKILL.md)
-- [dev.finish](file:///Users/andersonbuitron/proyectos/ia-agent-skills/skills/dev-finish/SKILL.md)
+El orquestador también maneja llamadas para escenarios de mantenimiento rápido:
+- Si el usuario dice "ayudame a refactorizar esto" → Deriva de inmediato a `/dev.refactor`.
+- Si el usuario reporta un bug → Usa `Skill("dev.fix")`.
+- Si pide ver tareas descartadas o por hacer a futuro → Usa `Skill("dev.backlog")`.
