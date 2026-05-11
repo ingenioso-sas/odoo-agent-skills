@@ -196,9 +196,9 @@ Al terminar una tarea:
 1. **Cumplimiento gary (3 Capas de validación)** (Salvo en Android/iOS, donde se compila nativamente con gradle o xcode).
    - *Capa 1*: Dockerfiles, /ping, versión.
    - *Capa 2*: Expertos de SDK (Java, Go, Python, Node).
-     - **Frontend (Nordic/Andes)**: Uso correcto de tags (`nordic/image` no `<img>`), design tokens, linting JS/CSS.
+     - **Frontend (Angular/Andes)**: Uso correcto de tags (`Angular/image` no `<img>`), design tokens, linting JS/CSS.
      - **Figma (design-to-code)**: Si hay un hash de Figma y es Frontend, forzar uso de la versión correcta de Andes (8, 9 o X) y verificar que los imports mapean con el technical spec.
-     - **Arquitectura de Servicios**: Validación de KVS, BigQueue, Secrets (prohibido URLs en secrets, se considerará CRÍTICO).
+     - **Arquitectura de Servicios**: Validación de BDs, Queues, Secrets (prohibido URLs en secrets, se considerará CRÍTICO).
    - *Capa 3*: Ejecución CI Pipeline.
 2. **Layer 3 Quality Gates**: Invocación final de `dev-validator-runner`.
 3. **Patrones Anti-Calidad**: `validate-code.sh` (Evitar inyecciones SQL, queries N+1).
