@@ -284,3 +284,13 @@ sorted_records = self.sorted(key=lambda r: r.date, reverse=True)
 ---
 
 **For more Odoo 13 guides, see [SKILL.md](../SKILL.md)**
+
+---
+
+## Best Practices
+
+### Avoid "God Objects" (Monolithic Models)
+When a model (like `res.company` or `res.partner`) becomes too complex, follow the **Separation of Concerns** principle:
+- **Mixins**: Split the logic into multiple files using Odoo's multiple inheritance (`_inherit`).
+- **Service Objects**: Move heavy external logic (like API integrations) to pure Python classes in a `utils/` directory.
+- **Surgical Refs**: Maintain a clean base model with only core fields and delegate complex behaviors to specialized mixins.

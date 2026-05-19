@@ -35,6 +35,7 @@ Complete guide for Odoo 13 module development: manifest structure, reports, secu
 5. [Wizards & Transient Models](#wizards--transient-models)
 6. [Data Files](#data-files)
 7. [Hooks](#hooks)
+8. [Refactoring & Maintenance](#refactoring--maintenance)
 
 ---
 
@@ -300,6 +301,17 @@ def post_init_hook(cr, registry):
 ```
 
 ---
+
+
+---
+
+## Refactoring & Maintenance
+
+To prevent regressions during refactoring (like the "ParseError: has no attribute" during updates), the following checklist is **mandatory** before finalizing any structural change:
+
+1.  **XML Dependency Audit**: Before deleting or moving any Python method, perform a global search (`grep`) in the `data/` and `views/` directories. Check for `<function>`, `<button type="object">`, or `eval` calls that reference the method.
+2.  **Initial Data Verification**: Methods like `init_csv_data` or `uninstall_custom_models` are often triggered by Odoo's internal registry during addon updates. They must remain in the base model or be explicitly imported in `__init__.py`.
+3.  **Migration Testing**: Always attempt a dry-run update (`odoo-bin -u <module_name> --stop-after-init`) to ensure the `data.xml` files still parse correctly with the new architecture.
 
 ## Exception Reference
 
